@@ -12,7 +12,7 @@ Ironman is a mix archive that can be installed by running:
 
 ## Suiting Up
 
-Ironman can be run by calling:
+Ironman can be run from the root of any project by calling:
 
 `mix suit_up`
 
