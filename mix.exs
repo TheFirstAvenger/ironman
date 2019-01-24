@@ -37,7 +37,7 @@ defmodule Ironman.MixProject do
   defp deps do
     [
       {:excoveralls, "~> 0.10.4", only: :test},
-      {:credo, "~> 1.0.1-rc1", only: :dev, runtime: false},
+      {:credo, "~> 1.0.1-rc1", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.19.3", only: :dev, runtime: false},
       {:mix_test_watch, "~> 0.9.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.4", only: :dev, runtime: false},
