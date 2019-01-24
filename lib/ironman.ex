@@ -1,16 +1,6 @@
 defmodule Ironman do
   @moduledoc """
-  Documentation for Ironman.
-  """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Ironman.hello()
-      :world
-
+  Ironman suits up your mix project, protecting it from vulnerabilities by configuring best practices.
   """
 
   alias Ironman.Runner
