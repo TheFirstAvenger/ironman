@@ -1,12 +1,17 @@
 defmodule Ironman.Utils.Deps do
   @moduledoc false
 
+  @ironman_version Mix.Project.config()[:version]
+
   @type dep :: atom()
 
   alias Ironman.{
     Config,
     Utils
   }
+
+  @spec ironman_version() :: String.t()
+  def ironman_version, do: @ironman_version
 
   @spec check_dep_version(Config.t(), dep()) :: {:yes | :no | :up_to_date, Config.t()} | {:error, any()}
   def check_dep_version(%Config{} = config, dep, dep_opts \\ []) when is_atom(dep) and is_list(dep_opts) do
@@ -44,8 +49,8 @@ defmodule Ironman.Utils.Deps do
   @spec available_version(dep()) :: {:ok, String.t()} | {:error, any()}
   def available_version(dep) do
     with(
-      {:ok, body} <- Ironman.Utils.get_body("https://hex.pm/api/packages/#{dep}"),
-      {:regex, [_ | [version | _]]} <- {:regex, Regex.run(~r/"releases":\[{.*?"version":"(.*?)"/, body)}
+      {:ok, body} <- Ironman.Utils.get_body_as_term("https://hex.pm/api/packages/#{dep}"),
+      %{"releases" => [%{"version" => version} | _]} <- body
     ) do
       {:ok, version}
     else

@@ -36,6 +36,7 @@ defmodule Ironman.Utils do
     System.cmd("mix", ["clean", "--deps"])
   end
 
+  @spec ask_mix_format() :: any()
   def ask_mix_format do
     ask(
       "Mix format changed mix.exs, would you like to exit (to commit format changes separately)?",
@@ -51,9 +52,9 @@ defmodule Ironman.Utils do
     File.write!("mix.exs", mix_exs)
   end
 
-  @spec get_body(String.t()) :: {:ok, String.t()} | {:error, any()}
-  def get_body(url) do
-    HttpClient.get_body(url)
+  @spec get_body_as_term(String.t()) :: {:ok, any()} | {:error, any()}
+  def get_body_as_term(url) do
+    HttpClient.get_body_as_term(url)
   end
 
   @spec ask(String.t(), function(), function(), function()) :: any()
