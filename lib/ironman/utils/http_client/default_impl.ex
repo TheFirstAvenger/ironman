@@ -2,6 +2,8 @@ defmodule Ironman.Utils.HttpClient.DefaultImpl do
   @moduledoc false
   @behaviour Ironman.Utils.HttpClient.Impl
 
+  alias Ironman.Utils.Deps
+
   # Credit to https://github.com/rrrene/credo
   @spec get_body_as_term(String.t()) :: {:error, any()} | {:ok, any()}
   def get_body_as_term(url) do
@@ -21,6 +23,6 @@ defmodule Ironman.Utils.HttpClient.DefaultImpl do
   end
 
   defp user_agent do
-    'Ironman/#{Ironman.Utils.Deps.ironman_version()} (Elixir/#{System.version()}) (OTP/#{System.otp_release()})'
+    'Ironman/#{Deps.ironman_version()} (Elixir/#{System.version()}) (OTP/#{System.otp_release()})'
   end
 end

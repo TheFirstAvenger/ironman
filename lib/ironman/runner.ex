@@ -6,6 +6,7 @@ defmodule Ironman.Runner do
   @checks [:ex_doc, :earmark, :dialyxir, :mix_test_watch, :credo, :excoveralls]
 
   def run do
+    if Utils.check_self_version() == :exit, do: System.halt()
     if Utils.check_mix_format() == :exit, do: System.halt()
     config = Config.new!()
     %Config{changed: changed} = config = Enum.reduce(@checks, config, &run_check(&2, &1))
