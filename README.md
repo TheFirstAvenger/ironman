@@ -1,5 +1,11 @@
 # Ironman
 
+[![Build Status](https://travis-ci.com/TheFirstAvenger/ironman.svg?branch=master)](https://travis-ci.com/TheFirstAvenger/ironman)
+[![Coverage Status](https://coveralls.io/repos/github/TheFirstAvenger/ironman/badge.svg?branch=master)](https://coveralls.io/github/TheFirstAvenger/ironman?branch=master)
+[![Project license](https://img.shields.io/hexpm/l/ironman.svg)](https://unlicense.org/)
+[![Hex.pm package](https://img.shields.io/hexpm/v/ironman.svg)](https://hex.pm/packages/ironman)
+[![Hex.pm downloads](https://img.shields.io/hexpm/dt/ironman.svg)](https://hex.pm/packages/ironman)
+
 `mix new` is like Tony Stark: Awesome and can do great things, but not bulletproof. When he suits up, however, his vulnerabilities are covered. Similarly, the Ironman project takes an elixir project (existing or newly created) and configures it in a way that protects it from getting in a bad state. It does this by adding dependencies for best practices such as `:credo` and `:dialyxir`, adding ci configuration for these tools, setting run configuration such as `warnings_as_errors`, etc...
 
 Each step of suiting up is confirmed with the end user before changing, and can be rejected individually.
