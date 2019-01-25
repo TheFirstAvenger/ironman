@@ -43,6 +43,6 @@ Contributions welcome. Specifically looking to:
 
 ### Additional Features
 
-* [ ] Self check/upgrade version
+* [X] Self check/upgrade version
 * [ ] Check all dependencies for updates
 * [ ] Ask what additional dependencies to add

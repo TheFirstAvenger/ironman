@@ -1,13 +1,39 @@
 defmodule Ironman.Utils do
   @moduledoc false
   alias Ironman.Config
-  alias Ironman.Utils.HttpClient
+  alias Ironman.Utils.{Cmd, Deps, HttpClient}
   alias Ironman.Utils.IO, as: IIO
 
   def puts(out) do
     if Mix.env() != :test do
       IO.puts(out)
     end
+  end
+
+  def check_self_version do
+    {:ok, available} = Deps.available_version(:ironman)
+
+    if available == Deps.ironman_version() do
+      :ok
+    else
+      ask_self_upgrade()
+    end
+  end
+
+  def ask_self_upgrade do
+    ask(
+      "Ironman is out of date. Upgrade?",
+      fn -> upgrade_ironman() end,
+      fn -> :declined end,
+      fn -> ask_self_upgrade() end
+    )
+  end
+
+  def upgrade_ironman do
+    puts("Upgrading ironman")
+    Cmd.run(["mix", "archive.install", "hex", "ironman", "--force"])
+    puts("Ironman upgraded, please re-run.")
+    :exit
   end
 
   def check_mix_format do
@@ -23,17 +49,17 @@ defmodule Ironman.Utils do
 
   def run_mix_format do
     puts("Running mix format...")
-    System.cmd("mix", ["format"])
+    Cmd.run(["mix", "format"])
   end
 
   def run_mix_deps_get do
     puts("Running mix deps.get")
-    System.cmd("mix", ["deps.get"])
+    Cmd.run(["mix", "deps.get"])
   end
 
   def run_mix_clean do
     puts("Running mix clean")
-    System.cmd("mix", ["clean", "--deps"])
+    Cmd.run(["mix", "clean", "--deps"])
   end
 
   @spec ask_mix_format() :: any()
@@ -59,8 +85,8 @@ defmodule Ironman.Utils do
 
   @spec ask(String.t(), function(), function(), function()) :: any()
   def ask(q, yes, no, other) do
-    case IIO.get("#{q}\n") do
-      x when x in ["Y\n", "y\n"] -> yes.()
+    case IIO.get("#{q} Yn\n") do
+      x when x in ["Y\n", "y\n", "\n"] -> yes.()
       x when x in ["N\n", "n\n"] -> no.()
       _ -> other.()
     end
