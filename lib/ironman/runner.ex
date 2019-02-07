@@ -40,6 +40,7 @@ defmodule Ironman.Runner do
   def run_check(%Config{} = config, :excoveralls),
     do: config |> SimpleDep.run(:excoveralls, only: :test) |> unwrap(:excoveralls)
 
+  @spec unwrap({atom(), Config.t()} | {:error, any()}, atom()) :: Config.t()
   def unwrap({:no, config}, _check), do: config
   def unwrap({:yes, config}, _check), do: config
   def unwrap({:up_to_date, config}, _check), do: config

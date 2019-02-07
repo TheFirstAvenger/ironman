@@ -18,7 +18,7 @@ defmodule Ironman.Checks.SimpleDepTest do
   describe "out of date" do
     test "updates when y pressed" do
       MoxHelpers.expect_dep_http(:ex_doc, "1.2.3")
-      MoxHelpers.expect_io("Upgrade ex_doc from ~> 1.2.2 to 1.2.3? Yn\n", "y")
+      MoxHelpers.expect_io("Upgrade ex_doc from ~> 1.2.2 to 1.2.3? [Yn] ", "y")
 
       %Config{mix_exs: mix_exs} = config = MixBuilder.with_deps(ex_doc: "~> 1.2.2")
       assert "~> 1.2.2" == Deps.get_configured_version(config, :ex_doc)
@@ -30,7 +30,7 @@ defmodule Ironman.Checks.SimpleDepTest do
 
     test "doesn't update when n pressed" do
       MoxHelpers.expect_dep_http(:ex_doc, "1.2.3")
-      MoxHelpers.expect_io("Upgrade ex_doc from ~> 1.2.2 to 1.2.3? Yn\n", "n")
+      MoxHelpers.expect_io("Upgrade ex_doc from ~> 1.2.2 to 1.2.3? [Yn] ", "n")
 
       %Config{mix_exs: mix_exs} = config = MixBuilder.with_deps(ex_doc: "~> 1.2.2")
       assert "~> 1.2.2" == Deps.get_configured_version(config, :ex_doc)
@@ -42,9 +42,9 @@ defmodule Ironman.Checks.SimpleDepTest do
 
     test "multiple" do
       MoxHelpers.expect_dep_http(:ex_doc, "1.2.3")
-      MoxHelpers.expect_io("Upgrade ex_doc from ~> 1.2.2 to 1.2.3? Yn\n", "y")
+      MoxHelpers.expect_io("Upgrade ex_doc from ~> 1.2.2 to 1.2.3? [Yn] ", "y")
       MoxHelpers.expect_dep_http(:earmark, "2.3.6")
-      MoxHelpers.expect_io("Upgrade earmark from ~> 2.3.4 to 2.3.6? Yn\n", "y")
+      MoxHelpers.expect_io("Upgrade earmark from ~> 2.3.4 to 2.3.6? [Yn] ", "y")
 
       %Config{mix_exs: mix_exs} = config = MixBuilder.with_deps(ex_doc: "~> 1.2.2", earmark: "~> 2.3.4")
 
@@ -65,7 +65,7 @@ defmodule Ironman.Checks.SimpleDepTest do
   describe "missing" do
     test "updates when y pressed" do
       MoxHelpers.expect_dep_http(:ex_doc, "1.2.3")
-      MoxHelpers.expect_io("Install ex_doc 1.2.3? Yn\n", "y")
+      MoxHelpers.expect_io("Install ex_doc 1.2.3? [Yn] ", "y")
 
       %Config{mix_exs: mix_exs} = config = MixBuilder.with_deps()
       assert nil == Deps.get_configured_version(config, :ex_doc)
@@ -77,7 +77,7 @@ defmodule Ironman.Checks.SimpleDepTest do
 
     test "doesn't update when n pressed" do
       MoxHelpers.expect_dep_http(:ex_doc, "1.2.3")
-      MoxHelpers.expect_io("Install ex_doc 1.2.3? Yn\n", "n")
+      MoxHelpers.expect_io("Install ex_doc 1.2.3? [Yn] ", "n")
 
       %Config{mix_exs: mix_exs} = config = MixBuilder.with_deps()
       assert nil == Deps.get_configured_version(config, :ex_doc)
@@ -90,9 +90,9 @@ defmodule Ironman.Checks.SimpleDepTest do
 
     test "multiple" do
       MoxHelpers.expect_dep_http(:ex_doc, "1.2.3")
-      MoxHelpers.expect_io("Install ex_doc 1.2.3? Yn\n", "y")
+      MoxHelpers.expect_io("Install ex_doc 1.2.3? [Yn] ", "y")
       MoxHelpers.expect_dep_http(:earmark, "2.3.6")
-      MoxHelpers.expect_io("Install earmark 2.3.6? Yn\n", "y")
+      MoxHelpers.expect_io("Install earmark 2.3.6? [Yn] ", "y")
 
       %Config{mix_exs: mix_exs} = config = MixBuilder.with_deps()
 
@@ -111,7 +111,7 @@ defmodule Ironman.Checks.SimpleDepTest do
 
     test "Sets dep_opts" do
       MoxHelpers.expect_dep_http(:ex_doc, "1.2.3")
-      MoxHelpers.expect_io("Install ex_doc 1.2.3? Yn\n", "y")
+      MoxHelpers.expect_io("Install ex_doc 1.2.3? [Yn] ", "y")
 
       %Config{mix_exs: mix_exs} = config = MixBuilder.with_deps()
       assert nil == Deps.get_configured_version(config, :ex_doc)

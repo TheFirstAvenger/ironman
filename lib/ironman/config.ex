@@ -5,17 +5,14 @@ defmodule Ironman.Config do
   """
   @type t :: %__MODULE__{
           mix_exs: String.t(),
-          deps: list(),
           changed: boolean()
         }
   defstruct mix_exs: nil,
-            deps: nil,
             changed: false
 
   def new!() do
     %__MODULE__{
-      mix_exs: File.read!("mix.exs"),
-      deps: Mix.Project.config()[:deps]
+      mix_exs: File.read!("mix.exs")
     }
   end
 end
