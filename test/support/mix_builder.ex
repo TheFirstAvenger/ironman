@@ -3,9 +3,8 @@ defmodule Ironman.Test.Helpers.MixBuilder do
   alias Ironman.Config
 
   def with_deps(deps \\ []) when is_list(deps) do
-    mix_exs =
-      """
-      defmodule Test.MixProject do
+    mix_exs = """
+    defmodule Test.MixProject do
       use Mix.Project
 
       def project do
@@ -22,11 +21,8 @@ defmodule Ironman.Test.Helpers.MixBuilder do
       defp deps do
         #{mix_string(deps)}
       end
-      end
-      """
-      |> Code.format_string!()
-      |> List.wrap()
-      |> IO.iodata_to_binary()
+    end
+    """
 
     %Config{mix_exs: mix_exs}
   end
@@ -34,10 +30,11 @@ defmodule Ironman.Test.Helpers.MixBuilder do
   @spec mix_string(list()) :: String.t()
   def mix_string(deps) do
     deps
-    |> Enum.map(fn {dep, ver} -> "{:#{dep}, \"#{ver}\"}" end)
-    |> Enum.join(",")
+    |> Enum.map(fn {dep, ver} -> "      {:#{dep}, \"#{ver}\"}" end)
+    |> Enum.join(",\n")
     |> wrap_brackets()
   end
 
-  defp wrap_brackets(str), do: "[ #{str} ]"
+  defp wrap_brackets(""), do: "[]"
+  defp wrap_brackets(str), do: "[\n#{str}\n    ]"
 end
