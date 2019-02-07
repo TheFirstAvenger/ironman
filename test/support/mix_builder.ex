@@ -28,9 +28,10 @@ defmodule Ironman.Test.Helpers.MixBuilder do
       |> List.wrap()
       |> IO.iodata_to_binary()
 
-    %Config{mix_exs: mix_exs, deps: deps}
+    %Config{mix_exs: mix_exs}
   end
 
+  @spec mix_string(list()) :: String.t()
   def mix_string(deps) do
     deps
     |> Enum.map(fn {dep, ver} -> "{:#{dep}, \"#{ver}\"}" end)

@@ -37,12 +37,13 @@ defmodule Ironman.Utils.Deps do
   end
 
   @spec get_configured_version(Config.t(), dep()) :: String.t() | nil
-  def get_configured_version(%Config{deps: deps}, dep) do
-    deps
-    |> Enum.find(fn d -> elem(d, 0) == dep end)
+  def get_configured_version(%Config{mix_exs: mix_exs}, dep) do
+    "defp deps do.*?\\[.*?{:#{dep}, \"(.*?)\""
+    |> Regex.compile!("s")
+    |> Regex.run(mix_exs)
     |> case do
-      nil -> nil
-      d -> elem(d, 1)
+      [_, version] -> version
+      _ -> nil
     end
   end
 
@@ -82,7 +83,7 @@ defmodule Ironman.Utils.Deps do
         "defp deps do\n    [{:#{dep}, \"#{new_version}\"#{dep_opts_str}},"
       )
 
-    {:yes, %Config{config | mix_exs: mix_exs, changed: true} |> add_dep_to_state(dep, dep_opts, new_version)}
+    {:yes, %Config{config | mix_exs: mix_exs, changed: true}}
   end
 
   defp dep_opts_to_str(dep_opts) do
@@ -118,31 +119,7 @@ defmodule Ironman.Utils.Deps do
     regex = Regex.compile!("{:#{dep}, \"~>.*?\"")
     mix_exs = Regex.replace(regex, mix_exs, "{:#{dep}, \"#{new_version}\"")
 
-    {:yes, %Config{config | mix_exs: mix_exs, changed: true} |> update_deps_state(dep, new_version)}
-  end
-
-  @spec update_deps_state(Ironman.Config.t(), dep(), String.t()) :: Ironman.Config.t()
-  def update_deps_state(%Config{deps: deps} = config, dep, new_version) do
-    deps =
-      Enum.map(deps, fn d ->
-        case elem(d, 0) do
-          ^dep -> d |> Tuple.delete_at(1) |> Tuple.insert_at(1, new_version)
-          _ -> d
-        end
-      end)
-
-    %Config{config | deps: deps}
-  end
-
-  @spec add_dep_to_state(Ironman.Config.t(), dep(), keyword(), String.t()) :: Ironman.Config.t()
-  def add_dep_to_state(%Config{deps: deps} = config, dep, dep_opts, new_version) do
-    new_dep =
-      case dep_opts do
-        [] -> {dep, new_version}
-        _ -> {dep, new_version, dep_opts}
-      end
-
-    %Config{config | deps: [new_dep | deps]}
+    {:yes, %Config{config | mix_exs: mix_exs, changed: true}}
   end
 
   @spec skip_upgrade(Config.t(), any()) :: {:no, Config.t()}

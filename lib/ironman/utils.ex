@@ -85,7 +85,7 @@ defmodule Ironman.Utils do
 
   @spec ask(String.t(), function(), function(), function()) :: any()
   def ask(q, yes, no, other) do
-    case IIO.get("#{q} Yn\n") do
+    case IIO.get("#{q} [Yn] ") do
       x when x in ["Y\n", "y\n", "\n"] -> yes.()
       x when x in ["N\n", "n\n"] -> no.()
       _ -> other.()
