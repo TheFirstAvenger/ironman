@@ -5,6 +5,7 @@
 * Change dependency checking to use regex
 * Clear dialyzer ignores fixed in elixir 1.8.1
 * Change format of IO questions
+* Add :git_hooks check
 
 ## 0.1.2
 
