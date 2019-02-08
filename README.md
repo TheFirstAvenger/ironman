@@ -38,7 +38,7 @@ Contributions welcome. Specifically looking to:
 * [X] [`:mix_test_watch`](https://github.com/lpil/mix-test.watch)
 * [X] [`:credo`](https://github.com/rrrene/credo)
 * [X] [`:excoveralls`](https://github.com/parroty/excoveralls)
-* [ ] [`:git_hooks`](https://github.com/qgadrian/elixir_git_hooks)
+* [X] [`:git_hooks`](https://github.com/qgadrian/elixir_git_hooks)
 
 ### Add Configuration
 

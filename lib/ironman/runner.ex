@@ -3,7 +3,7 @@ defmodule Ironman.Runner do
   alias Ironman.Checks.SimpleDep
   alias Ironman.{Config, Utils}
 
-  @checks [:ex_doc, :earmark, :dialyxir, :mix_test_watch, :credo, :excoveralls]
+  @checks [:ex_doc, :earmark, :dialyxir, :mix_test_watch, :credo, :excoveralls, :git_hooks]
 
   def run do
     if Utils.check_self_version() == :exit, do: System.halt()
@@ -39,6 +39,9 @@ defmodule Ironman.Runner do
 
   def run_check(%Config{} = config, :excoveralls),
     do: config |> SimpleDep.run(:excoveralls, only: :test) |> unwrap(:excoveralls)
+
+  def run_check(%Config{} = config, :git_hooks),
+    do: config |> SimpleDep.run(:git_hooks, only: :test) |> unwrap(:git_hooks)
 
   @spec unwrap({atom(), Config.t()} | {:error, any()}, atom()) :: Config.t()
   def unwrap({:no, config}, _check), do: config
