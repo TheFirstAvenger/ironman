@@ -1,11 +1,13 @@
 # Changelog
 
-## Next
+## 0.2.0
 
 * Change dependency checking to use regex
 * Clear dialyzer ignores fixed in elixir 1.8.1
 * Change format of IO questions
 * Add :git_hooks check
+* Add :dialyzer_config check
+* Mox/Impl all File operations
 
 ## 0.1.2
 

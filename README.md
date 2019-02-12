@@ -42,7 +42,7 @@ Contributions welcome. Specifically looking to:
 
 ### Add Configuration
 
-* [ ] [`:dialyxir`](https://github.com/jeremyjh/dialyxir)
+* [X] [`:dialyxir`](https://github.com/jeremyjh/dialyxir)
 * [ ] [`:credo`](https://github.com/rrrene/credo)
 * [ ] [`:excoveralls`](https://github.com/parroty/excoveralls)
 * [ ] [`:git_hooks`](https://github.com/qgadrian/elixir_git_hooks)
