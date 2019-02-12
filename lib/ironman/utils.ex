@@ -2,12 +2,11 @@ defmodule Ironman.Utils do
   @moduledoc false
   alias Ironman.Config
   alias Ironman.Utils.{Cmd, Deps, HttpClient}
+  alias Ironman.Utils.File, as: IFile
   alias Ironman.Utils.IO, as: IIO
 
   def puts(out) do
-    if Mix.env() != :test do
-      IO.puts(out)
-    end
+    if Mix.env() != :test, do: IO.puts(out)
   end
 
   def check_self_version do
@@ -24,8 +23,7 @@ defmodule Ironman.Utils do
     ask(
       "Ironman is out of date. Upgrade?",
       fn -> upgrade_ironman() end,
-      fn -> :declined end,
-      fn -> ask_self_upgrade() end
+      fn -> :declined end
     )
   end
 
@@ -37,10 +35,10 @@ defmodule Ironman.Utils do
   end
 
   def check_mix_format do
-    start = File.read!("mix.exs")
+    start = IFile.read!("mix.exs")
     run_mix_format()
 
-    if start == File.read!("mix.exs") do
+    if start == IFile.read!("mix.exs") do
       :ok
     else
       ask_mix_format()
@@ -67,15 +65,34 @@ defmodule Ironman.Utils do
     ask(
       "Mix format changed mix.exs, would you like to exit (to commit format changes separately)?",
       fn -> :exit end,
-      fn -> :ok end,
-      fn -> ask_mix_format() end
+      fn -> :ok end
     )
   end
 
+  def write_changes(%Config{} = config) do
+    if Config.mix_exs_changed(config), do: write_mix_exs(config)
+    if Config.gitignore_changed(config), do: write_gitignore(config)
+    if Config.dialyzer_ignore_changed(config), do: write_dialyzer_ignore(config)
+
+    Config.mix_exs_changed(config) or Config.gitignore_changed(config) or Config.dialyzer_ignore_changed(config)
+  end
+
   @spec write_mix_exs(Config.t()) :: :ok
-  def write_mix_exs(%Config{mix_exs: mix_exs}) do
+  defp write_mix_exs(%Config{} = config) do
     puts("Writing new mix.exs...")
-    File.write!("mix.exs", mix_exs)
+    IFile.write!("mix.exs", Config.mix_exs(config))
+  end
+
+  @spec write_gitignore(Config.t()) :: :ok
+  defp write_gitignore(%Config{} = config) do
+    puts("Writing new gitignore...")
+    IFile.write!(".gitignore", Config.gitignore(config))
+  end
+
+  @spec write_dialyzer_ignore(Config.t()) :: :ok
+  defp write_dialyzer_ignore(%Config{} = config) do
+    puts("Writing new dialyzer_ignore...")
+    IFile.write!(".dialyzer_ignore.exs", Config.dialyzer_ignore(config))
   end
 
   @spec get_body_as_term(String.t()) :: {:ok, any()} | {:error, any()}
@@ -83,12 +100,12 @@ defmodule Ironman.Utils do
     HttpClient.get_body_as_term(url)
   end
 
-  @spec ask(String.t(), function(), function(), function()) :: any()
-  def ask(q, yes, no, other) do
+  @spec ask(String.t(), function(), function()) :: any()
+  def ask(q, yes, no) do
     case IIO.get("#{q} [Yn] ") do
       x when x in ["Y\n", "y\n", "\n"] -> yes.()
       x when x in ["N\n", "n\n"] -> no.()
-      _ -> other.()
+      _ -> ask(q, yes, no)
     end
   end
 end

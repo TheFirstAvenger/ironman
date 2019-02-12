@@ -4,4 +4,5 @@ config :ironman,
   hex_repo: "https://hex.pm",
   http_client: Ironman.MockHttpClient,
   io: Ironman.MockIO,
-  cmd: Ironman.MockCmd
+  cmd: Ironman.MockCmd,
+  file: Ironman.MockFile

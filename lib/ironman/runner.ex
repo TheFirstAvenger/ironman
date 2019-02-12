@@ -1,18 +1,17 @@
 defmodule Ironman.Runner do
   @moduledoc false
-  alias Ironman.Checks.SimpleDep
+  alias Ironman.Checks.{DialyzerConfig, SimpleDep}
   alias Ironman.{Config, Utils}
 
-  @checks [:ex_doc, :earmark, :dialyxir, :mix_test_watch, :credo, :excoveralls, :git_hooks]
+  @checks [:ex_doc, :earmark, :dialyxir, :mix_test_watch, :credo, :excoveralls, :git_hooks, :dialyzer_config]
 
   def run do
     if Utils.check_self_version() == :exit, do: System.halt()
     if Utils.check_mix_format() == :exit, do: System.halt()
     config = Config.new!()
-    %Config{changed: changed} = config = Enum.reduce(@checks, config, &run_check(&2, &1))
+    config = Enum.reduce(@checks, config, &run_check(&2, &1))
 
-    if changed do
-      Utils.write_mix_exs(config)
+    if Utils.write_changes(config) do
       Utils.run_mix_format()
       Utils.run_mix_deps_get()
       Utils.run_mix_clean()
@@ -42,6 +41,9 @@ defmodule Ironman.Runner do
 
   def run_check(%Config{} = config, :git_hooks),
     do: config |> SimpleDep.run(:git_hooks, only: :test) |> unwrap(:git_hooks)
+
+  def run_check(%Config{} = config, :dialyzer_config),
+    do: config |> DialyzerConfig.run() |> unwrap(:dialyzer_config)
 
   @spec unwrap({atom(), Config.t()} | {:error, any()}, atom()) :: Config.t()
   def unwrap({:no, config}, _check), do: config

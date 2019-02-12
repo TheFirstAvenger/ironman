@@ -37,13 +37,24 @@ defmodule Ironman.Utils.Deps do
   end
 
   @spec get_configured_version(Config.t(), dep()) :: String.t() | nil
-  def get_configured_version(%Config{mix_exs: mix_exs}, dep) do
+  def get_configured_version(%Config{} = config, dep) do
     "defp deps do.*?\\[.*?{:#{dep}, \"(.*?)\""
     |> Regex.compile!("s")
-    |> Regex.run(mix_exs)
+    |> Regex.run(Config.mix_exs(config))
     |> case do
       [_, version] -> version
       _ -> nil
+    end
+  end
+
+  @spec get_configured_opts(Config.t(), dep()) :: String.t() | nil
+  def get_configured_opts(%Config{} = config, dep) do
+    "defp deps do.*?\\[.*?{:#{dep}, \"(.*?)\"(.*?)}"
+    |> Regex.compile!("s")
+    |> Regex.run(Config.mix_exs(config))
+    |> case do
+      [_, _, ""] -> nil
+      [_, _, ", " <> opts] -> "[#{opts}]" |> Code.eval_string() |> elem(0)
     end
   end
 
@@ -65,25 +76,27 @@ defmodule Ironman.Utils.Deps do
     Utils.ask(
       "Install #{dep} #{available_version}?",
       fn -> do_install(config, dep, dep_opts, available_version) end,
-      fn -> skip_install(config, dep) end,
-      fn -> offer_dep_install(config, dep, dep_opts, available_version) end
+      fn -> skip_install(config, dep) end
     )
   end
 
   @spec do_install(Config.t(), dep(), keyword(), String.t()) :: {:yes, Config.t()}
-  def do_install(%Config{mix_exs: mix_exs} = config, dep, dep_opts, available_version) do
+  def do_install(%Config{} = config, dep, dep_opts, available_version) do
     Utils.puts("Installing #{dep} #{available_version}")
     new_version = "~> #{available_version}"
     dep_opts_str = dep_opts_to_str(dep_opts)
 
-    mix_exs =
-      Regex.replace(
-        ~r/defp deps do.*?\n.*?\[/,
-        mix_exs,
-        "defp deps do\n    [{:#{dep}, \"#{new_version}\"#{dep_opts_str}},"
+    config =
+      Config.set_mix_exs(
+        config,
+        Regex.replace(
+          ~r/defp deps do.*?\n.*?\[/,
+          Config.mix_exs(config),
+          "defp deps do\n    [{:#{dep}, \"#{new_version}\"#{dep_opts_str}},"
+        )
       )
 
-    {:yes, %Config{config | mix_exs: mix_exs, changed: true}}
+    {:yes, config}
   end
 
   defp dep_opts_to_str(dep_opts) do
@@ -106,20 +119,19 @@ defmodule Ironman.Utils.Deps do
     Utils.ask(
       "Upgrade #{dep} from #{configured_version} to #{available_version}?",
       fn -> do_upgrade(config, dep, configured_version, available_version) end,
-      fn -> skip_upgrade(config, dep) end,
-      fn -> offer_dep_upgrade(config, dep, configured_version, available_version) end
+      fn -> skip_upgrade(config, dep) end
     )
   end
 
   @spec do_upgrade(Config.t(), dep(), String.t(), String.t()) :: {:yes, Config.t()}
-  def do_upgrade(%Config{mix_exs: mix_exs} = config, dep, configured_version, available_version) do
+  def do_upgrade(%Config{} = config, dep, configured_version, available_version) do
     # TODO
     Utils.puts("Upgrading #{dep} from #{configured_version} to #{available_version}")
     new_version = "~> #{available_version}"
     regex = Regex.compile!("{:#{dep}, \"~>.*?\"")
-    mix_exs = Regex.replace(regex, mix_exs, "{:#{dep}, \"#{new_version}\"")
+    config = Config.set_mix_exs(config, Regex.replace(regex, Config.mix_exs(config), "{:#{dep}, \"#{new_version}\""))
 
-    {:yes, %Config{config | mix_exs: mix_exs, changed: true}}
+    {:yes, config}
   end
 
   @spec skip_upgrade(Config.t(), any()) :: {:no, Config.t()}
