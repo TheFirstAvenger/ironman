@@ -40,7 +40,7 @@ defmodule Ironman.Utils.Deps do
   def get_configured_version(%Config{} = config, dep) do
     "defp deps do.*?\\[.*?{:#{dep}, \"(.*?)\""
     |> Regex.compile!("s")
-    |> Regex.run(Config.mix_exs(config))
+    |> Regex.run(Config.get(config, :mix_exs))
     |> case do
       [_, version] -> version
       _ -> nil
@@ -51,7 +51,7 @@ defmodule Ironman.Utils.Deps do
   def get_configured_opts(%Config{} = config, dep) do
     "defp deps do.*?\\[.*?{:#{dep}, \"(.*?)\"(.*?)}"
     |> Regex.compile!("s")
-    |> Regex.run(Config.mix_exs(config))
+    |> Regex.run(Config.get(config, :mix_exs))
     |> case do
       [_, _, ""] -> nil
       [_, _, ", " <> opts] -> "[#{opts}]" |> Code.eval_string() |> elem(0)
@@ -66,8 +66,8 @@ defmodule Ironman.Utils.Deps do
     ) do
       {:ok, version}
     else
-      {:regex, _} -> raise "Release not found on https://hex.pm/api/packages/#{dep}"
       {:error, reason} -> {:error, reason}
+      _ -> raise "Could not parse release in body of https://hex.pm/api/packages/#{dep}"
     end
   end
 
@@ -87,11 +87,12 @@ defmodule Ironman.Utils.Deps do
     dep_opts_str = dep_opts_to_str(dep_opts)
 
     config =
-      Config.set_mix_exs(
+      Config.set(
         config,
+        :mix_exs,
         Regex.replace(
           ~r/defp deps do.*?\n.*?\[/,
-          Config.mix_exs(config),
+          Config.get(config, :mix_exs),
           "defp deps do\n    [{:#{dep}, \"#{new_version}\"#{dep_opts_str}},"
         )
       )
@@ -110,7 +111,7 @@ defmodule Ironman.Utils.Deps do
 
   @spec skip_install(Config.t(), dep()) :: {:no, Config.t()}
   def skip_install(%Config{} = config, dep) do
-    Utils.puts("Skipping install of #{dep}")
+    Utils.puts("\nSkipping install of #{dep}")
     {:no, config}
   end
 
@@ -129,14 +130,16 @@ defmodule Ironman.Utils.Deps do
     Utils.puts("Upgrading #{dep} from #{configured_version} to #{available_version}")
     new_version = "~> #{available_version}"
     regex = Regex.compile!("{:#{dep}, \"~>.*?\"")
-    config = Config.set_mix_exs(config, Regex.replace(regex, Config.mix_exs(config), "{:#{dep}, \"#{new_version}\""))
+
+    config =
+      Config.set(config, :mix_exs, Regex.replace(regex, Config.get(config, :mix_exs), "{:#{dep}, \"#{new_version}\""))
 
     {:yes, config}
   end
 
   @spec skip_upgrade(Config.t(), any()) :: {:no, Config.t()}
   def skip_upgrade(%Config{} = config, dep) do
-    Utils.puts("Skipping upgrade of #{dep}")
+    Utils.puts("\nSkipping upgrade of #{dep}")
     {:no, config}
   end
 end

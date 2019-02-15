@@ -1,8 +1,10 @@
 defmodule Ironman.Utils do
   @moduledoc false
   alias Ironman.Config
-  alias Ironman.Utils.{Cmd, Deps, HttpClient}
+  alias Ironman.Utils.Cmd, as: ICmd
+  alias Ironman.Utils.Deps
   alias Ironman.Utils.File, as: IFile
+  alias Ironman.Utils.HttpClient, as: IHttpClient
   alias Ironman.Utils.IO, as: IIO
 
   def puts(out) do
@@ -29,80 +31,88 @@ defmodule Ironman.Utils do
 
   def upgrade_ironman do
     puts("Upgrading ironman")
-    Cmd.run(["mix", "archive.install", "hex", "ironman", "--force"])
-    puts("Ironman upgraded, please re-run.")
+    :ok = ICmd.run(["mix", "archive.install", "hex", "ironman", "--force"])
+    puts("Ironman upgraded, please run 'mix suit_up' again.")
     :exit
   end
 
   def check_mix_format do
-    start = IFile.read!("mix.exs")
-    run_mix_format()
-
-    if start == IFile.read!("mix.exs") do
-      :ok
-    else
-      ask_mix_format()
+    case ICmd.run(["mix", "format", "--check-formatted"]) do
+      :ok -> :ok
+      :error -> ask_mix_format()
     end
   end
 
   def run_mix_format do
     puts("Running mix format...")
-    Cmd.run(["mix", "format"])
+    :ok = ICmd.run(["mix", "format"])
   end
 
   def run_mix_deps_get do
     puts("Running mix deps.get")
-    Cmd.run(["mix", "deps.get"])
+    :ok = ICmd.run(["mix", "deps.get"])
   end
 
   def run_mix_clean do
     puts("Running mix clean")
-    Cmd.run(["mix", "clean", "--deps"])
+    :ok = ICmd.run(["mix", "clean", "--deps"])
   end
 
   @spec ask_mix_format() :: any()
   def ask_mix_format do
     ask(
-      "Mix format changed mix.exs, would you like to exit (to commit format changes separately)?",
-      fn -> :exit end,
-      fn -> :ok end
+      "Your files are not formatted. Mix Format needs to be run before continuing",
+      fn ->
+        run_mix_format()
+
+        ask(
+          "Mix format complete. Exit now so you can commit the formatted version before continuing",
+          fn -> :exit end,
+          fn -> :ok end
+        )
+      end,
+      fn -> :exit end
     )
   end
 
   def write_changes(%Config{} = config) do
-    if Config.mix_exs_changed(config), do: write_mix_exs(config)
-    if Config.gitignore_changed(config), do: write_gitignore(config)
-    if Config.dialyzer_ignore_changed(config), do: write_dialyzer_ignore(config)
+    puts("")
+    write_if_changed(config, :mix_exs)
+    write_if_changed(config, :gitignore)
+    write_if_changed(config, :dialyzer_ignore)
+    write_if_changed(config, :config_exs)
+    write_if_changed(config, :config_dev_exs)
+    write_if_changed(config, :config_test_exs)
+    write_if_changed(config, :config_prod_exs)
 
-    Config.mix_exs_changed(config) or Config.gitignore_changed(config) or Config.dialyzer_ignore_changed(config)
+    Config.any_changed?(config)
   end
 
-  @spec write_mix_exs(Config.t()) :: :ok
-  defp write_mix_exs(%Config{} = config) do
-    puts("Writing new mix.exs...")
-    IFile.write!("mix.exs", Config.mix_exs(config))
+  @spec write_if_changed(Config.t(), atom()) :: :ok
+  defp write_if_changed(%Config{} = config, key) do
+    if Config.changed?(config, key) do
+      file = path_of(key)
+      puts("Writing new #{file}...")
+      IFile.write!(file, Config.get(config, key))
+    end
   end
 
-  @spec write_gitignore(Config.t()) :: :ok
-  defp write_gitignore(%Config{} = config) do
-    puts("Writing new gitignore...")
-    IFile.write!(".gitignore", Config.gitignore(config))
-  end
-
-  @spec write_dialyzer_ignore(Config.t()) :: :ok
-  defp write_dialyzer_ignore(%Config{} = config) do
-    puts("Writing new dialyzer_ignore...")
-    IFile.write!(".dialyzer_ignore.exs", Config.dialyzer_ignore(config))
-  end
+  def path_of(:mix_exs), do: "mix.exs"
+  def path_of(:gitignore), do: ".gitignore"
+  def path_of(:dialyzer_ignore), do: ".dialyzer_ignore.exs"
+  def path_of(:config_exs), do: "config/config.exs"
+  def path_of(:config_dev_exs), do: "config/dev.exs"
+  def path_of(:config_test_exs), do: "config/test.exs"
+  def path_of(:config_prod_exs), do: "config/prod.exs"
 
   @spec get_body_as_term(String.t()) :: {:ok, any()} | {:error, any()}
   def get_body_as_term(url) do
-    HttpClient.get_body_as_term(url)
+    IHttpClient.get_body_as_term(url)
   end
 
   @spec ask(String.t(), function(), function()) :: any()
   def ask(q, yes, no) do
-    case IIO.get("#{q} [Yn] ") do
+    case IIO.get("\n#{q} [Yn] ") do
       x when x in ["Y\n", "y\n", "\n"] -> yes.()
       x when x in ["N\n", "n\n"] -> no.()
       _ -> ask(q, yes, no)

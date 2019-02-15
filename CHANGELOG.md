@@ -1,5 +1,11 @@
 # Changelog
 
+## Next
+
+* Add :git_hooks config
+* Improve test coverage
+* Reworked config internal manipulation
+
 ## 0.2.0
 
 * Change dependency checking to use regex
