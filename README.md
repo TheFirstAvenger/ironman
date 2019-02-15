@@ -45,10 +45,16 @@ Contributions welcome. Specifically looking to:
 * [X] [`:dialyxir`](https://github.com/jeremyjh/dialyxir)
 * [ ] [`:credo`](https://github.com/rrrene/credo)
 * [ ] [`:excoveralls`](https://github.com/parroty/excoveralls)
-* [ ] [`:git_hooks`](https://github.com/qgadrian/elixir_git_hooks)
+* [X] [`:git_hooks`](https://github.com/qgadrian/elixir_git_hooks)
+
+### CI Configurations
+
+* [ ] Travis
+* [ ] Gitlabs
 
 ### Additional Features
 
 * [X] Self check/upgrade version
 * [ ] Check all dependencies for updates
 * [ ] Ask what additional dependencies to add
+* [ ] Check/warn for uncommitted files before running

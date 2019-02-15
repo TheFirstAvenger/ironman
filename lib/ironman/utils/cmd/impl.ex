@@ -1,4 +1,4 @@
 defmodule Ironman.Utils.Cmd.Impl do
   @moduledoc false
-  @callback run(args :: [String.t()]) :: :ok
+  @callback run(args :: [String.t()]) :: :ok | :error
 end
