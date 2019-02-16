@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+* Add mix clean prior to mix compile on git push hook to catch warnings.
+
 ## 0.3.0
 
 * Add :git_hooks config
