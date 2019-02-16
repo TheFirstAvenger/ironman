@@ -20,7 +20,7 @@ defmodule Ironman do
   alias Ironman.Utils
 
   def run do
-    Utils.puts("suiting up...")
+    Utils.puts("\nSuiting up...")
 
     Runner.run()
   end

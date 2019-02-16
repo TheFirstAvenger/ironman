@@ -4,7 +4,7 @@ defmodule Ironman.MixProject do
   def project do
     [
       app: :ironman,
-      version: "0.2.0",
+      version: "0.3.0",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -43,7 +43,7 @@ defmodule Ironman.MixProject do
       {:mix_test_watch, "~> 0.9.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
       {:earmark, "~> 1.3.1", only: :dev, runtime: false},
-      {:mox, "~> 0.4.0", only: :test}
+      {:mox, "~> 0.5.0", only: :test}
     ]
   end
 
@@ -59,6 +59,6 @@ defmodule Ironman.MixProject do
   end
 
   defp description do
-    "Automated project configuration with Elixir best practices"
+    "Automated project configuration with Elixir best practices. Simply run 'mix archive.install hex ironman' once, then in your project run 'mix suit_up'."
   end
 end

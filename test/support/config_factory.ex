@@ -1,6 +1,13 @@
-defmodule Ironman.Test.Helpers.MixBuilder do
+defmodule Ironman.Test.Helpers.ConfigFactory do
   @moduledoc false
   alias Ironman.Config
+
+  def empty do
+    %Config{
+      mix_exs: "",
+      config_exs: ""
+    }
+  end
 
   def with_deps(deps \\ []) when is_list(deps) do
     mix_exs = """
@@ -24,11 +31,13 @@ defmodule Ironman.Test.Helpers.MixBuilder do
     end
     """
 
-    %Config{starting_project_config: [app: :test]}
-    |> Config.set_mix_exs(mix_exs)
+    empty()
+    |> Map.put(:starting_project_config, app: :test)
+    |> Config.set(:mix_exs, mix_exs)
+    |> Config.set(:config_exs, "use Mix.Config\n\n")
   end
 
-  def with_dialyzer do
+  def with_dialyzer_config do
     mix_exs = """
     defmodule Test.MixProject do
       use Mix.Project
@@ -50,13 +59,21 @@ defmodule Ironman.Test.Helpers.MixBuilder do
 
       # Run "mix help deps" to learn about dependencies.
       defp deps do
-        []
+        [
+          {:dialyxir, "~> 1.2.3"}
+        ]
       end
     end
     """
 
-    %Config{starting_project_config: [dialyzer: [:asdf]]}
-    |> Config.set_mix_exs(mix_exs)
+    empty()
+    |> Map.put(:starting_project_config, dialyzer: [:asdf])
+    |> Config.set(:mix_exs, mix_exs)
+  end
+
+  def with_git_hooks_config do
+    with_deps(git_hooks: "1.2.3")
+    |> Config.set(:config_dev_exs, "use Mix.Config\n\nconfig :git_hooks,")
   end
 
   @spec mix_string(list()) :: String.t()
