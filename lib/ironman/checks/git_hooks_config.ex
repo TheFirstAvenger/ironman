@@ -113,6 +113,7 @@ defmodule Ironman.Checks.GitHooksConfig do
         pre_push: [
           verbose: true,
           mix_tasks: [
+            "clean",
             "compile --warnings-as-errors",#{tasks}
           ]
         ]
