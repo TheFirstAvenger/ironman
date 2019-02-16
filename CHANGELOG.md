@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## 0.3.0
 
 * Add :git_hooks config
 * Improve test coverage
