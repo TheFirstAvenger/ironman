@@ -22,6 +22,8 @@ defmodule Ironman.ConfigTest do
     MoxHelpers.expect_file_read!(".gitignore", "This is a gitignore file")
     MoxHelpers.expect_file_exists?(".dialyzer_ignore.exs")
     MoxHelpers.expect_file_read!(".dialyzer_ignore.exs", "This is a dialyzer ignore file")
+    MoxHelpers.expect_file_exists?(".credo.exs")
+    MoxHelpers.expect_file_read!(".credo.exs", "This is a credo config file")
   end
 
   defp all_fields_equal_except(config1, config2, field) do

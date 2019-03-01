@@ -63,13 +63,6 @@ defmodule Ironman.Runner do
   def unwrap({:no, config}, _check), do: config
   def unwrap({:yes, config}, _check), do: config
   def unwrap({:up_to_date, config}, _check), do: config
+  def unwrap({:skip, config}, _check), do: config
   def unwrap({:error, reason}, check), do: raise("Check #{check} returned #{reason}")
-
-  # @spec run_check!(Config.t(), atom()) :: Ironman.Config.t()
-  # def run_check!(%Config{} = config, check) when is_atom(check) do
-  #   case run_check(config, check) do
-  #     {:ok, config} -> config
-  #     {:error, reason} -> raise "Error running check #{check}: #{inspect(reason)}"
-  #   end
-  # end
 end

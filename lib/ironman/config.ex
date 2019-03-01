@@ -14,7 +14,8 @@ defmodule Ironman.Config do
     :config_exs,
     :config_test_exs,
     :config_dev_exs,
-    :config_prod_exs
+    :config_prod_exs,
+    :credo_exs
   ]
 
   @type t :: %__MODULE__{
@@ -26,6 +27,7 @@ defmodule Ironman.Config do
           config_dev_exs: String.t() | nil,
           config_prod_exs: String.t() | nil,
           starting_project_config: keyword(),
+          credo_exs: String.t() | nil,
           changed: MapSet.t(atom())
         }
   defstruct mix_exs: nil,
@@ -36,6 +38,7 @@ defmodule Ironman.Config do
             config_dev_exs: nil,
             config_prod_exs: nil,
             starting_project_config: nil,
+            credo_exs: nil,
             changed: MapSet.new()
 
   def new!() do
@@ -47,6 +50,7 @@ defmodule Ironman.Config do
       config_prod_exs: file_or_nil(Utils.path_of(:config_prod_exs)),
       gitignore: file_or_nil(Utils.path_of(:gitignore)),
       dialyzer_ignore: file_or_nil(Utils.path_of(:dialyzer_ignore)),
+      credo_exs: file_or_nil(Utils.path_of(:credo_exs)),
       starting_project_config: Mix.Project.config()
     }
   end
@@ -69,8 +73,14 @@ defmodule Ironman.Config do
 
   def any_changed?(%Config{changed: changed}), do: MapSet.size(changed) > 0
 
-  def app_name(%Config{starting_project_config: starting_project_config}),
-    do: Keyword.fetch!(starting_project_config, :app)
+  def app_name(%Config{starting_project_config: starting_project_config}) do
+    starting_project_config
+    |> Keyword.fetch!(:app)
+    |> parent_folder_if_nil()
+  end
+
+  defp parent_folder_if_nil(nil), do: File.cwd!() |> String.split("/") |> List.last()
+  defp parent_folder_if_nil(x), do: x
 
   defp file_or_nil(path) do
     if IFile.exists?(path) do

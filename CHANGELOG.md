@@ -1,12 +1,18 @@
 # Changelog
 
+## 0.3.2
+
+* Add :credo config check
+* Use parent folder for app name if :app not defined in mix.exs (e.g. umbrella)
+* Add app_name.plt.hash to .gitignore for :dialyzer_config
+
 ## 0.3.1
 
 * Add mix clean prior to mix compile on git push hook to catch warnings.
 
 ## 0.3.0
 
-* Add :git_hooks config
+* Add :git_hooks config check
 * Improve test coverage
 * Reworked config internal manipulation
 

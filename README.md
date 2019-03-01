@@ -51,6 +51,7 @@ Contributions welcome. Specifically looking to:
 
 * [ ] Travis
 * [ ] Gitlabs
+* [ ] CircleCI
 
 ### Additional Features
 

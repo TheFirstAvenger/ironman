@@ -100,6 +100,7 @@ defmodule Ironman.Utils do
   def path_of(:mix_exs), do: "mix.exs"
   def path_of(:gitignore), do: ".gitignore"
   def path_of(:dialyzer_ignore), do: ".dialyzer_ignore.exs"
+  def path_of(:credo_exs), do: ".credo.exs"
   def path_of(:config_exs), do: "config/config.exs"
   def path_of(:config_dev_exs), do: "config/dev.exs"
   def path_of(:config_test_exs), do: "config/test.exs"

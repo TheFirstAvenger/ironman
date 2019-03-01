@@ -3,7 +3,7 @@ defmodule Ironman.Checks.DialyzerConfig do
   alias Ironman.{Config, Utils}
   alias Ironman.Utils.Deps
 
-  @spec run(Config.t()) :: {:error, any()} | {:no | :yes | :up_to_date, Config.t()}
+  @spec run(Config.t()) :: {:error, any()} | {:no | :yes | :up_to_date | :skip, Config.t()}
   def run(%Config{} = config) do
     case Deps.get_configured_version(config, :dialyxir) do
       nil ->
@@ -24,7 +24,7 @@ defmodule Ironman.Checks.DialyzerConfig do
     Utils.ask(
       "Add dialyzer config to project?",
       fn -> do_add_config(config) end,
-      fn -> skip_install(config) end
+      fn -> decline_install(config) end
     )
   end
 
@@ -81,14 +81,25 @@ defmodule Ironman.Checks.DialyzerConfig do
         else
           Utils.puts("Adding #{app_name}.plt to .gitignore")
           newlines = if String.ends_with?(gitignore, "\n"), do: "", else: "\n\n"
-          Config.set(config, :gitignore, "#{gitignore}#{newlines}# dialyzer plt\n#{app_name}.plt\n")
+
+          Config.set(
+            config,
+            :gitignore,
+            "#{gitignore}#{newlines}# dialyzer plt\n#{app_name}.plt\n#{app_name}.plt.hash\n"
+          )
         end
     end
   end
 
-  @spec skip_install(Config.t()) :: {:no, Config.t()}
+  @spec skip_install(Config.t()) :: {:skip, Config.t()}
   def skip_install(%Config{} = config) do
     Utils.puts("\nSkipping dialyzer config")
+    {:skip, config}
+  end
+
+  @spec decline_install(Config.t()) :: {:no, Config.t()}
+  def decline_install(%Config{} = config) do
+    Utils.puts("\nDeclined dialyzer config")
     {:no, config}
   end
 end
