@@ -1,4 +1,4 @@
-defmodule Ironman.Checks.DialyzerTest do
+defmodule Ironman.Checks.DialyzerConfigTest do
   use ExUnit.Case
 
   alias Ironman.Checks.DialyzerConfig
@@ -8,7 +8,7 @@ defmodule Ironman.Checks.DialyzerTest do
   describe "run" do
     test "skips when dialyxir not present" do
       config = ConfigFactory.with_deps()
-      {:no, config2} = DialyzerConfig.run(config)
+      {:skip, config2} = DialyzerConfig.run(config)
       assert config == config2
     end
 
@@ -40,7 +40,9 @@ defmodule Ironman.Checks.DialyzerTest do
       config = Config.set(config, :gitignore, "existing gitignore\n\nvalues\n\n", false)
       MoxHelpers.expect_io("\nAdd dialyzer config to project? [Yn] ", "Y")
       {:yes, config2} = DialyzerConfig.run(config)
-      assert "existing gitignore\n\nvalues\n\n# dialyzer plt\ntest.plt\n" = Config.get(config2, :gitignore)
+
+      assert "existing gitignore\n\nvalues\n\n# dialyzer plt\ntest.plt\ntest.plt.hash\n" =
+               Config.get(config2, :gitignore)
     end
 
     test "runs when config not present - gitignore exists no end newline" do
@@ -48,7 +50,9 @@ defmodule Ironman.Checks.DialyzerTest do
       config = Config.set(config, :gitignore, "existing gitignore\n\nvalues", false)
       MoxHelpers.expect_io("\nAdd dialyzer config to project? [Yn] ", "Y")
       {:yes, config2} = DialyzerConfig.run(config)
-      assert "existing gitignore\n\nvalues\n\n# dialyzer plt\ntest.plt\n" = Config.get(config2, :gitignore)
+
+      assert "existing gitignore\n\nvalues\n\n# dialyzer plt\ntest.plt\ntest.plt.hash\n" =
+               Config.get(config2, :gitignore)
     end
 
     test "runs when config not present - gitignore exists has plt" do

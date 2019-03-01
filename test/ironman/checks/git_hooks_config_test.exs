@@ -6,6 +6,12 @@ defmodule Ironman.Checks.GitHooksConfigTest do
   alias Ironman.Test.Helpers.{ConfigFactory, MoxHelpers}
 
   describe "run" do
+    test "skips when git_hooks not present" do
+      config = ConfigFactory.with_deps()
+      {:skip, config2} = GitHooksConfig.run(config)
+      assert config == config2
+    end
+
     test "skips when config present" do
       config = ConfigFactory.with_git_hooks_config()
       {:up_to_date, config2} = GitHooksConfig.run(config)

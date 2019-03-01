@@ -3,14 +3,20 @@ defmodule Ironman.Checks.GitHooksConfig do
   alias Ironman.{Config, Utils}
   alias Ironman.Utils.Deps
 
-  @spec run(Config.t()) :: {:error, any()} | {:no | :yes | :up_to_date, Config.t()}
+  @spec run(Config.t()) :: {:error, any()} | {:no | :yes | :up_to_date | :skip, Config.t()}
   def run(%Config{} = config) do
-    dev_exs = Config.get(config, :config_dev_exs)
+    case Deps.get_configured_version(config, :git_hooks) do
+      nil ->
+        skip_install(config)
 
-    if !dev_exs or !String.contains?(dev_exs, "config :git_hooks") do
-      offer_add_githooks_config(config)
-    else
-      {:up_to_date, config}
+      _ ->
+        dev_exs = Config.get(config, :config_dev_exs)
+
+        if !dev_exs or !String.contains?(dev_exs, "config :git_hooks") do
+          offer_add_githooks_config(config)
+        else
+          {:up_to_date, config}
+        end
     end
   end
 
@@ -18,7 +24,7 @@ defmodule Ironman.Checks.GitHooksConfig do
     Utils.ask(
       "Add git_hooks config to project?",
       fn -> do_add_config(config) end,
-      fn -> skip_install(config) end
+      fn -> decline_install(config) end
     )
   end
 
@@ -121,9 +127,15 @@ defmodule Ironman.Checks.GitHooksConfig do
     """
   end
 
-  @spec skip_install(Config.t()) :: {:no, Config.t()}
+  @spec skip_install(Config.t()) :: {:skip, Config.t()}
   def skip_install(%Config{} = config) do
     Utils.puts("\nSkipping git_hooks config")
+    {:skip, config}
+  end
+
+  @spec decline_install(Config.t()) :: {:no, Config.t()}
+  def decline_install(%Config{} = config) do
+    Utils.puts("\nDeclined git_hooks config")
     {:no, config}
   end
 end
