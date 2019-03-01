@@ -39,13 +39,15 @@ Contributions welcome. Specifically looking to:
 * [X] [`:credo`](https://github.com/rrrene/credo)
 * [X] [`:excoveralls`](https://github.com/parroty/excoveralls)
 * [X] [`:git_hooks`](https://github.com/qgadrian/elixir_git_hooks)
+* [ ] [`:ex_unit_notifier`](https://github.com/navinpeiris/ex_unit_notifier)
 
 ### Add Configuration
 
 * [X] [`:dialyxir`](https://github.com/jeremyjh/dialyxir)
-* [ ] [`:credo`](https://github.com/rrrene/credo)
-* [ ] [`:excoveralls`](https://github.com/parroty/excoveralls)
+* [X] [`:credo`](https://github.com/rrrene/credo)
+* [X] [`:excoveralls`](https://github.com/parroty/excoveralls)
 * [X] [`:git_hooks`](https://github.com/qgadrian/elixir_git_hooks)
+* [ ] [`:ex_unit_notifier`](https://github.com/navinpeiris/ex_unit_notifier)
 
 ### CI Configurations
 
@@ -59,3 +61,4 @@ Contributions welcome. Specifically looking to:
 * [ ] Check all dependencies for updates
 * [ ] Ask what additional dependencies to add
 * [ ] Check/warn for uncommitted files before running
+* [ ] Add test to ensure README.md referenced version is up to date with project version
