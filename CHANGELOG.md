@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+* Ask at end if user wants to install any other dependencies
+* Add pre-check for presence of mix.exs file
+* Add pre-check for uncommitted files (to allow ironman changes to be in their own commit)
+* Add timer sleep before deps.get to reduce collision with ElixirLS
+
 ## 0.3.3
 
 * Add :coveralls config check

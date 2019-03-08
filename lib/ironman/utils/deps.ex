@@ -111,7 +111,7 @@ defmodule Ironman.Utils.Deps do
 
   @spec skip_install(Config.t(), dep()) :: {:no, Config.t()}
   def skip_install(%Config{} = config, dep) do
-    Utils.puts("\nSkipping install of #{dep}")
+    Utils.puts("\nDeclined install of #{dep}")
     {:no, config}
   end
 

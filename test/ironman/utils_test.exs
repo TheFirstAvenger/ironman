@@ -34,18 +34,18 @@ defmodule Ironman.UtilsTest do
     end
 
     test "exits on dirty format declined" do
-      MoxHelpers.expect_cmd(["mix", "format", "--check-formatted"], :error)
-      MoxHelpers.expect_io("\nYour files are not formatted. Mix Format needs to be run before continuing [Yn] ", "n")
+      MoxHelpers.expect_cmd(["mix", "format", "--check-formatted"], {:error, 1})
+      MoxHelpers.expect_io("\nYour files are not formatted. Mix Format needs to be run before continuing. [Yn] ", "n")
       assert :exit = Utils.check_mix_format()
     end
 
     test "runs then exits on dirty format accepted format, accepted exit" do
-      MoxHelpers.expect_cmd(["mix", "format", "--check-formatted"], :error)
-      MoxHelpers.expect_io("\nYour files are not formatted. Mix Format needs to be run before continuing [Yn] ", "y")
+      MoxHelpers.expect_cmd(["mix", "format", "--check-formatted"], {:error, 1})
+      MoxHelpers.expect_io("\nYour files are not formatted. Mix Format needs to be run before continuing. [Yn] ", "y")
       MoxHelpers.expect_cmd(["mix", "format"])
 
       MoxHelpers.expect_io(
-        "\nMix format complete. Exit now so you can commit the formatted version before continuing [Yn] ",
+        "\nMix format complete. Exit now so you can commit the formatted version before continuing? [Yn] ",
         "y"
       )
 
@@ -53,12 +53,12 @@ defmodule Ironman.UtilsTest do
     end
 
     test "runs then ok on dirty format accepted format, decline exit" do
-      MoxHelpers.expect_cmd(["mix", "format", "--check-formatted"], :error)
-      MoxHelpers.expect_io("\nYour files are not formatted. Mix Format needs to be run before continuing [Yn] ", "y")
+      MoxHelpers.expect_cmd(["mix", "format", "--check-formatted"], {:error, 1})
+      MoxHelpers.expect_io("\nYour files are not formatted. Mix Format needs to be run before continuing. [Yn] ", "y")
       MoxHelpers.expect_cmd(["mix", "format"])
 
       MoxHelpers.expect_io(
-        "\nMix format complete. Exit now so you can commit the formatted version before continuing [Yn] ",
+        "\nMix format complete. Exit now so you can commit the formatted version before continuing? [Yn] ",
         "n"
       )
 
