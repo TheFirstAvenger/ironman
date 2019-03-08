@@ -4,7 +4,12 @@
     "lib/mix/tasks/suit_up.ex",
     "lib/ironman/utils/io/default_impl.ex",
     "lib/ironman/utils/http_client/default_impl.ex",
+    "lib/ironman/utils/http_client/impl.ex",
     "lib/ironman/utils/cmd/default_impl.ex",
-    "lib/ironman/utils/file/default_impl.ex"
+    "lib/ironman/utils/cmd/impl.ex",
+    "lib/ironman/utils/file/default_impl.ex",
+    "lib/ironman/utils/file/impl.ex",
+    "lib/ironman/utils/io/default_impl.ex",
+    "lib/ironman/utils/io/impl.ex"
   ]
 }

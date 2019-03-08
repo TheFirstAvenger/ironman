@@ -84,6 +84,7 @@ defmodule Ironman.Utils do
     write_if_changed(config, :config_dev_exs)
     write_if_changed(config, :config_test_exs)
     write_if_changed(config, :config_prod_exs)
+    write_if_changed(config, :coveralls_json)
 
     Config.any_changed?(config)
   end
@@ -101,6 +102,7 @@ defmodule Ironman.Utils do
   def path_of(:gitignore), do: ".gitignore"
   def path_of(:dialyzer_ignore), do: ".dialyzer_ignore.exs"
   def path_of(:credo_exs), do: ".credo.exs"
+  def path_of(:coveralls_json), do: "coveralls.json"
   def path_of(:config_exs), do: "config/config.exs"
   def path_of(:config_dev_exs), do: "config/dev.exs"
   def path_of(:config_test_exs), do: "config/test.exs"

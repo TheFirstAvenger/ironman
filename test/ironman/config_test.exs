@@ -24,6 +24,8 @@ defmodule Ironman.ConfigTest do
     MoxHelpers.expect_file_read!(".dialyzer_ignore.exs", "This is a dialyzer ignore file")
     MoxHelpers.expect_file_exists?(".credo.exs")
     MoxHelpers.expect_file_read!(".credo.exs", "This is a credo config file")
+    MoxHelpers.expect_file_exists?("coveralls.json")
+    MoxHelpers.expect_file_read!("coveralls.json", "This is a coveralls config file")
   end
 
   defp all_fields_equal_except(config1, config2, field) do
@@ -46,6 +48,8 @@ defmodule Ironman.ConfigTest do
       assert "This is a config dev exs file" == Config.get(config, :config_dev_exs)
       assert "This is a config prod exs file" == Config.get(config, :config_prod_exs)
       assert "This is a config test exs file" == Config.get(config, :config_test_exs)
+      assert "This is a credo config file" == Config.get(config, :credo_exs)
+      assert "This is a coveralls config file" == Config.get(config, :coveralls_json)
     end
   end
 
@@ -214,6 +218,54 @@ defmodule Ironman.ConfigTest do
       refute Config.changed?(config, :config_prod_exs)
       new_config = Config.set(config, :config_prod_exs, "a different value")
       assert Config.changed?(new_config, :config_prod_exs)
+    end
+  end
+
+  describe "credo_exs" do
+    test "set updates field" do
+      set_new_expectations()
+      config = Config.new!()
+      new_config = Config.set(config, :credo_exs, "a different value")
+      assert "a different value" == Config.get(new_config, :credo_exs)
+    end
+
+    test "set doesn't change other fields" do
+      set_new_expectations()
+      config = Config.new!()
+      new_config = Config.set(config, :credo_exs, "a different value")
+      all_fields_equal_except(config, new_config, :credo_exs)
+    end
+
+    test "set updates changed flag" do
+      set_new_expectations()
+      config = Config.new!()
+      refute Config.changed?(config, :credo_exs)
+      new_config = Config.set(config, :credo_exs, "a different value")
+      assert Config.changed?(new_config, :credo_exs)
+    end
+  end
+
+  describe "coveralls_json" do
+    test "set updates field" do
+      set_new_expectations()
+      config = Config.new!()
+      new_config = Config.set(config, :coveralls_json, "a different value")
+      assert "a different value" == Config.get(new_config, :coveralls_json)
+    end
+
+    test "set doesn't change other fields" do
+      set_new_expectations()
+      config = Config.new!()
+      new_config = Config.set(config, :coveralls_json, "a different value")
+      all_fields_equal_except(config, new_config, :coveralls_json)
+    end
+
+    test "set updates changed flag" do
+      set_new_expectations()
+      config = Config.new!()
+      refute Config.changed?(config, :coveralls_json)
+      new_config = Config.set(config, :coveralls_json, "a different value")
+      assert Config.changed?(new_config, :coveralls_json)
     end
   end
 end

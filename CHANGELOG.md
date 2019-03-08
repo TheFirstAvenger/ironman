@@ -1,10 +1,15 @@
 # Changelog
 
+## 0.3.3
+
+* Add :coveralls config check
+
 ## 0.3.2
 
 * Add :credo config check
 * Use parent folder for app name if :app not defined in mix.exs (e.g. umbrella)
 * Add app_name.plt.hash to .gitignore for :dialyzer_config
+* Separate `:skip` and `:no` returns for checks
 
 ## 0.3.1
 

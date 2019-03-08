@@ -4,7 +4,7 @@ defmodule Ironman.MixProject do
   def project do
     [
       app: :ironman,
-      version: "0.3.2",
+      version: "0.3.3",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),

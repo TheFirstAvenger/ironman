@@ -1,6 +1,6 @@
 defmodule Ironman.Runner do
   @moduledoc false
-  alias Ironman.Checks.{DialyzerConfig, GitHooksConfig, SimpleDep}
+  alias Ironman.Checks.{CoverallsConfig, DialyzerConfig, GitHooksConfig, SimpleDep}
   alias Ironman.{Config, Utils}
 
   @checks [
@@ -12,7 +12,8 @@ defmodule Ironman.Runner do
     :excoveralls,
     :git_hooks,
     :dialyzer_config,
-    :git_hooks_config
+    :git_hooks_config,
+    :coveralls_config
   ]
 
   def run do
@@ -58,6 +59,9 @@ defmodule Ironman.Runner do
 
   def run_check(%Config{} = config, :git_hooks_config),
     do: config |> GitHooksConfig.run() |> unwrap(:git_hooks_config)
+
+  def run_check(%Config{} = config, :coveralls_config),
+    do: config |> CoverallsConfig.run() |> unwrap(:coveralls_config)
 
   @spec unwrap({atom(), Config.t()} | {:error, any()}, atom()) :: Config.t()
   def unwrap({:no, config}, _check), do: config

@@ -15,7 +15,8 @@ defmodule Ironman.Config do
     :config_test_exs,
     :config_dev_exs,
     :config_prod_exs,
-    :credo_exs
+    :credo_exs,
+    :coveralls_json
   ]
 
   @type t :: %__MODULE__{
@@ -28,6 +29,7 @@ defmodule Ironman.Config do
           config_prod_exs: String.t() | nil,
           starting_project_config: keyword(),
           credo_exs: String.t() | nil,
+          coveralls_json: String.t() | nil,
           changed: MapSet.t(atom())
         }
   defstruct mix_exs: nil,
@@ -39,6 +41,7 @@ defmodule Ironman.Config do
             config_prod_exs: nil,
             starting_project_config: nil,
             credo_exs: nil,
+            coveralls_json: nil,
             changed: MapSet.new()
 
   def new!() do
@@ -51,6 +54,7 @@ defmodule Ironman.Config do
       gitignore: file_or_nil(Utils.path_of(:gitignore)),
       dialyzer_ignore: file_or_nil(Utils.path_of(:dialyzer_ignore)),
       credo_exs: file_or_nil(Utils.path_of(:credo_exs)),
+      coveralls_json: file_or_nil(Utils.path_of(:coveralls_json)),
       starting_project_config: Mix.Project.config()
     }
   end

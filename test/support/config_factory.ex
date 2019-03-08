@@ -33,8 +33,8 @@ defmodule Ironman.Test.Helpers.ConfigFactory do
 
     empty()
     |> Map.put(:starting_project_config, app: :test)
-    |> Config.set(:mix_exs, mix_exs)
-    |> Config.set(:config_exs, "use Mix.Config\n\n")
+    |> Config.set(:mix_exs, mix_exs, false)
+    |> Config.set(:config_exs, "use Mix.Config\n\n", false)
   end
 
   def with_dialyzer_config do
@@ -68,12 +68,46 @@ defmodule Ironman.Test.Helpers.ConfigFactory do
 
     empty()
     |> Map.put(:starting_project_config, dialyzer: [:asdf])
-    |> Config.set(:mix_exs, mix_exs)
+    |> Config.set(:mix_exs, mix_exs, false)
+  end
+
+  def with_coveralls_config do
+    mix_exs = """
+    defmodule Test.MixProject do
+      use Mix.Project
+
+      def project do
+      [
+        app: :test,
+        version: "0.1.0",
+        elixir: "~> 1.8",
+        start_permanent: Mix.env() == :prod,
+        deps: deps(),
+        test_coverage: [tool: ExCoveralls],
+        preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test]
+      ]
+      end
+
+      # Run "mix help deps" to learn about dependencies.
+      defp deps do
+        [
+          {:excoveralls, "~> 1.2.3"}
+        ]
+      end
+    end
+    """
+
+    empty()
+    |> Map.put(:starting_project_config,
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test]
+    )
+    |> Config.set(:mix_exs, mix_exs, false)
   end
 
   def with_git_hooks_config do
     with_deps(git_hooks: "1.2.3")
-    |> Config.set(:config_dev_exs, "use Mix.Config\n\nconfig :git_hooks,")
+    |> Config.set(:config_dev_exs, "use Mix.Config\n\nconfig :git_hooks,", false)
   end
 
   @spec mix_string(list()) :: String.t()
