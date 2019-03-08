@@ -31,42 +31,73 @@ defmodule Ironman.Utils do
 
   def upgrade_ironman do
     puts("Upgrading ironman")
-    :ok = ICmd.run(["mix", "archive.install", "hex", "ironman", "--force"])
+    {:ok, _} = ICmd.run(["mix", "archive.install", "hex", "ironman", "--force"])
     puts("Ironman upgraded, please run 'mix suit_up' again.")
     :exit
   end
 
   def check_mix_format do
     case ICmd.run(["mix", "format", "--check-formatted"]) do
-      :ok -> :ok
-      :error -> ask_mix_format()
+      {:ok, _} -> :ok
+      {:error, _} -> ask_mix_format()
     end
   end
 
   def run_mix_format do
     puts("Running mix format...")
-    :ok = ICmd.run(["mix", "format"])
+    {:ok, _} = ICmd.run(["mix", "format"])
+  end
+
+  def check_git_status do
+    case ICmd.run(["git", "status", "--porcelain"]) do
+      {:ok, ""} ->
+        :ok
+
+      {:ok, _} ->
+        ask(
+          "You seem to have uncommitted files. Exit now so you can commit before continuing?",
+          fn -> :exit end,
+          fn -> :ok end
+        )
+
+      {:error, _} ->
+        puts("Unable to check for uncommitted files (not a git repository)")
+        :ok
+    end
+  rescue
+    _ ->
+      puts("Unable to check for uncommitted files (git not found)")
+      :ok
+  end
+
+  def check_mix_exs do
+    if IFile.exists?("mix.exs") do
+      :ok
+    else
+      puts("No mix.exs file found, exiting.")
+      :exit
+    end
   end
 
   def run_mix_deps_get do
     puts("Running mix deps.get")
-    :ok = ICmd.run(["mix", "deps.get"])
+    {:ok, _} = ICmd.run(["mix", "deps.get"])
   end
 
   def run_mix_clean do
     puts("Running mix clean")
-    :ok = ICmd.run(["mix", "clean", "--deps"])
+    {:ok, _} = ICmd.run(["mix", "clean", "--deps"])
   end
 
   @spec ask_mix_format() :: any()
   def ask_mix_format do
     ask(
-      "Your files are not formatted. Mix Format needs to be run before continuing",
+      "Your files are not formatted. Mix Format needs to be run before continuing.",
       fn ->
         run_mix_format()
 
         ask(
-          "Mix format complete. Exit now so you can commit the formatted version before continuing",
+          "Mix format complete. Exit now so you can commit the formatted version before continuing?",
           fn -> :exit end,
           fn -> :ok end
         )
@@ -85,8 +116,6 @@ defmodule Ironman.Utils do
     write_if_changed(config, :config_test_exs)
     write_if_changed(config, :config_prod_exs)
     write_if_changed(config, :coveralls_json)
-
-    Config.any_changed?(config)
   end
 
   @spec write_if_changed(Config.t(), atom()) :: :ok

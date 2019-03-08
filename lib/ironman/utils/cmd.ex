@@ -2,7 +2,7 @@ defmodule Ironman.Utils.Cmd do
   @moduledoc false
   @behaviour Ironman.Utils.Cmd.Impl
 
-  @spec run([String.t()]) :: :ok | :error
+  @spec run([String.t()]) :: {:ok, String.t()} | {:error, non_neg_integer()}
   def run(args) do
     impl().run(args)
   end
