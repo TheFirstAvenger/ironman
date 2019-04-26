@@ -3,7 +3,7 @@ defmodule Ironman.Checks.CredoConfig do
   alias Ironman.{Config, Utils}
   alias Ironman.Utils.Deps
 
-  @credo_config_filename "deps/credo/.credo.exs"
+  @credo_config_filename Path.join([__DIR__, "../../../deps/credo/.credo.exs"])
   @default_credo_config_file File.read!(@credo_config_filename)
 
   @spec run(Config.t()) :: {:error, any()} | {:no | :yes | :up_to_date | :skip, Config.t()}

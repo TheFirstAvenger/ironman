@@ -4,7 +4,7 @@ defmodule Ironman.MixProject do
   def project do
     [
       app: :ironman,
-      version: "0.4.0",
+      version: "0.4.1",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -54,7 +54,8 @@ defmodule Ironman.MixProject do
   defp package do
     [
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/TheFirstAvenger/ironman"}
+      links: %{"GitHub" => "https://github.com/TheFirstAvenger/ironman"},
+      files: ["deps/credo/.credo.exs", "lib", "priv", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*", "changelog*", "src"]
     ]
   end
 
