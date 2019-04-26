@@ -55,7 +55,19 @@ defmodule Ironman.MixProject do
     [
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/TheFirstAvenger/ironman"},
-      files: ["deps/credo/.credo.exs", "lib", "priv", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*", "changelog*", "src"]
+      files: [
+        "deps/credo/.credo.exs",
+        "lib",
+        "priv",
+        "mix.exs",
+        "README*",
+        "readme*",
+        "LICENSE*",
+        "license*",
+        "CHANGELOG*",
+        "changelog*",
+        "src"
+      ]
     ]
   end
 
