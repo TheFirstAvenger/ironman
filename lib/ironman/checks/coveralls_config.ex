@@ -29,6 +29,7 @@ defmodule Ironman.Checks.CoverallsConfig do
   end
 
   def do_add_config(%Config{} = config) do
+    Utils.puts "Adding coveralls config to project"
     config =
       config
       |> set_coveralls_mix_exs()

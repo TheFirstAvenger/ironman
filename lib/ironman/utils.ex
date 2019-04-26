@@ -116,6 +116,7 @@ defmodule Ironman.Utils do
     write_if_changed(config, :config_test_exs)
     write_if_changed(config, :config_prod_exs)
     write_if_changed(config, :coveralls_json)
+    write_if_changed(config, :credo_exs)
   end
 
   @spec write_if_changed(Config.t(), atom()) :: :ok

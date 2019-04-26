@@ -29,8 +29,8 @@ defmodule Ironman.Checks.CredoConfig do
   end
 
   defp do_add_config(%Config{} = config) do
+    Utils.puts "Adding credo config to project"
     config = Config.set(config, :credo_exs, @default_credo_config_file)
-
     {:yes, config}
   end
 

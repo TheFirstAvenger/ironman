@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.2
+
+* Enabled credo config check
+
 ## 0.4.1
 
 * Reworked credo default config import.
