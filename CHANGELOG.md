@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+
+* Reworked credo default config import.
+
 ## 0.4.0
 
 * Ask at end if user wants to install any other dependencies
