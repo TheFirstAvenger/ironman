@@ -9,6 +9,7 @@ defmodule Ironman.Checks.CredoConfigTest do
     test "skips when credo not present" do
       config = ConfigFactory.with_deps()
       {:skip, config2} = CredoConfig.run(config)
+      assert MapSet.size(config2.changed) == 0
       assert config == config2
     end
 
@@ -16,6 +17,7 @@ defmodule Ironman.Checks.CredoConfigTest do
       config = ConfigFactory.with_deps(credo: "~ 1.2.3")
       config = Config.set(config, :credo_exs, "This is a credo config", false)
       {:up_to_date, config2} = CredoConfig.run(config)
+      assert MapSet.size(config2.changed) == 0
       assert config == config2
     end
 
@@ -23,6 +25,7 @@ defmodule Ironman.Checks.CredoConfigTest do
       config = ConfigFactory.with_deps(credo: "~> 1.2.3")
       MoxHelpers.expect_io("\nAdd credo config to project? [Yn] ", "N")
       {:no, config2} = CredoConfig.run(config)
+      assert MapSet.size(config2.changed) == 0
       assert config == config2
     end
 
@@ -32,6 +35,7 @@ defmodule Ironman.Checks.CredoConfigTest do
       MoxHelpers.expect_io("\nAdd credo config to project? [Yn] ", "Y")
       {:yes, config2} = CredoConfig.run(config)
       new_config = Config.get(config2, :credo_exs)
+      assert MapSet.size(config2.changed) == 1
       assert String.contains?(new_config, "This file contains the configuration for Credo")
     end
   end
