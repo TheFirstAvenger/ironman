@@ -30,7 +30,8 @@ defmodule Ironman.Config do
           starting_project_config: keyword(),
           credo_exs: String.t() | nil,
           coveralls_json: String.t() | nil,
-          changed: MapSet.t(atom())
+          changed: MapSet.t(atom()),
+          skipped_upgrades: MapSet.t(atom())
         }
   defstruct mix_exs: nil,
             gitignore: nil,
@@ -42,7 +43,8 @@ defmodule Ironman.Config do
             starting_project_config: nil,
             credo_exs: nil,
             coveralls_json: nil,
-            changed: MapSet.new()
+            changed: MapSet.new(),
+            skipped_upgrades: MapSet.new()
 
   def new!() do
     %__MODULE__{

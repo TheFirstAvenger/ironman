@@ -138,8 +138,21 @@ defmodule Ironman.Utils.Deps do
   end
 
   @spec skip_upgrade(Config.t(), any()) :: {:no, Config.t()}
-  def skip_upgrade(%Config{} = config, dep) do
-    Utils.puts("\nSkipping upgrade of #{dep}")
-    {:no, config}
+  def skip_upgrade(%Config{skipped_upgrades: skipped_upgrades} = config, dep) do
+    Utils.puts("\nDeclined upgrade of #{dep}")
+    {:no, %{config | skipped_upgrades: MapSet.put(skipped_upgrades, dep)}}
+  end
+
+  def get_installed_deps(%Config{} = config) do
+    deps_str =
+      "defp deps do\\s*?\\[\\s*?({.*?})\\s*?]\\s*?end"
+      |> Regex.compile!("s")
+      |> Regex.run(Config.get(config, :mix_exs))
+      |> Enum.at(1)
+
+    "{:([a-z_]*)"
+    |> Regex.compile!()
+    |> Regex.scan(deps_str)
+    |> Enum.map(&Enum.at(&1, 1))
   end
 end

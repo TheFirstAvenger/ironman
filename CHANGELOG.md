@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.3
+
+* Add check to update all outdated installed dependencies.
+* Retry if `mix deps.get` times out (can happen if ElixirLS kicks it off before Ironman does)
+
 ## 0.4.2
 
 * Enabled credo config check
