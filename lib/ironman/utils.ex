@@ -45,7 +45,15 @@ defmodule Ironman.Utils do
 
   def run_mix_format do
     puts("Running mix format...")
-    {:ok, _} = ICmd.run(["mix", "format"])
+
+    case ICmd.run(["mix", "format"]) do
+      {:ok, _} ->
+        :ok
+
+      {:error, {1, output}} ->
+        puts("Error running mix format:\n\n#{output}")
+        :exit
+    end
   end
 
   def check_git_status do
@@ -81,7 +89,19 @@ defmodule Ironman.Utils do
 
   def run_mix_deps_get do
     puts("Running mix deps.get")
-    {:ok, _} = ICmd.run(["mix", "deps.get"])
+
+    case ICmd.run(["mix", "deps.get"]) do
+      {:ok, str} ->
+        {:ok, str}
+
+      {:error, {1, msg}} ->
+        if msg =~ "(EXIT) time out" do
+          puts("Timed out running mix deps.get, retrying")
+          run_mix_deps_get()
+        else
+          raise "Failure running mix deps.get: #{inspect(msg)}"
+        end
+    end
   end
 
   def run_mix_clean do
@@ -93,17 +113,23 @@ defmodule Ironman.Utils do
   def ask_mix_format do
     ask(
       "Your files are not formatted. Mix Format needs to be run before continuing.",
-      fn ->
-        run_mix_format()
+      &run_mix_format_and_ask_to_exit/0,
+      fn -> :exit end
+    )
+  end
 
+  defp run_mix_format_and_ask_to_exit do
+    case run_mix_format() do
+      :ok ->
         ask(
           "Mix format complete. Exit now so you can commit the formatted version before continuing?",
           fn -> :exit end,
           fn -> :ok end
         )
-      end,
-      fn -> :exit end
-    )
+
+      :exit ->
+        :exit
+    end
   end
 
   def write_changes(%Config{} = config) do

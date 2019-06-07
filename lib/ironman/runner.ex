@@ -1,6 +1,6 @@
 defmodule Ironman.Runner do
   @moduledoc false
-  alias Ironman.Checks.{AddDeps, CoverallsConfig, CredoConfig, DialyzerConfig, GitHooksConfig, SimpleDep}
+  alias Ironman.Checks.{AddDeps, CoverallsConfig, CredoConfig, DialyzerConfig, GitHooksConfig, SimpleDep, UpdateAllDeps}
   alias Ironman.{Config, Utils}
 
   @checks [
@@ -15,6 +15,7 @@ defmodule Ironman.Runner do
     :git_hooks_config,
     :coveralls_config,
     :credo_exs,
+    :update_all_deps,
     :add_deps
   ]
 
@@ -71,6 +72,9 @@ defmodule Ironman.Runner do
 
   def run_check(%Config{} = config, :credo_exs),
     do: config |> CredoConfig.run() |> unwrap(:credo_exs)
+
+  def run_check(%Config{} = config, :update_all_deps),
+    do: config |> UpdateAllDeps.run() |> unwrap(:update_all_deps)
 
   def run_check(%Config{} = config, :add_deps),
     do: config |> AddDeps.run() |> unwrap(:add_deps)

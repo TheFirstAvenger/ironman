@@ -60,6 +60,6 @@ Contributions welcome. Specifically looking to:
 * [X] Self check/upgrade version
 * [X] Check for mix.exs file before running
 * [X] Check/warn for uncommitted files before running
-* [ ] Check all dependencies for updates
+* [X] Check all dependencies for updates
 * [X] Ask what additional dependencies to add
 * [ ] Add test to ensure README.md referenced version is up to date with project version

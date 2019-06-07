@@ -47,7 +47,7 @@ defmodule Ironman.Checks.AddDepsTest do
       MoxHelpers.expect_dep_http(:foo_bar, "1.2.4")
       MoxHelpers.expect_io("\nUpgrade foo_bar from ~> 1.2.3 to 1.2.4? [Yn] ", "n")
       MoxHelpers.expect_io("\nInstall any other dependencies? [Yn] ", "n")
-
+      config = %{config | skipped_upgrades: MapSet.new([:foo_bar])}
       assert {:no, ^config} = AddDeps.run(config)
     end
 
