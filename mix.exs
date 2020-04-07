@@ -38,7 +38,7 @@ defmodule Ironman.MixProject do
     [
       {:git_hooks, "~> 0.2.0", only: :test},
       {:excoveralls, "~> 0.10.5", only: :test},
-      {:credo, "~> 1.0.2", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.4.0-rc.1", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.19.3", only: :dev, runtime: false},
       {:mix_test_watch, "~> 0.9.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},

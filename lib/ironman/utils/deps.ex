@@ -168,9 +168,11 @@ defmodule Ironman.Utils.Deps do
   end
 
   def get_installed_deps(%Config{} = config) do
+    mix = config |> Config.get(:mix_exs) |> remove_comments()
+
     "defp deps do\\s*?\\[\\s*?({.*?})\\s*?]\\s*?end"
     |> Regex.compile!("s")
-    |> Regex.run(Config.get(config, :mix_exs) |> remove_comments())
+    |> Regex.run(mix)
     |> case do
       nil ->
         []
