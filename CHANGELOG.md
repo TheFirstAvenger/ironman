@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## 0.4.4
 
 * Better handling of comments in deps detection, install, and update
 * Ask before running check_all_deps check
