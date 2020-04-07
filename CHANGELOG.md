@@ -2,6 +2,9 @@
 
 ## Next
 
+* Better handling of comments in deps detection, install, and update
+* Ask before running check_all_deps check
+* Warn instead of crash when dep is not found on hex
 * Remove earmark check (it is now a dependency of :ex_doc)
 
 ## 0.4.3
