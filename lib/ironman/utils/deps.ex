@@ -85,16 +85,24 @@ defmodule Ironman.Utils.Deps do
     Utils.puts("Installing #{dep} #{available_version}")
     new_version = "~> #{available_version}"
     dep_opts_str = dep_opts_to_str(dep_opts)
+    current_mix = Config.get(config, :mix_exs)
+
+    new_mix =
+      Regex.replace(
+        ~r/defp deps do.*?[\n\s\S]*?\[/,
+        current_mix,
+        "defp deps do\n    [{:#{dep}, \"#{new_version}\"#{dep_opts_str}},"
+      )
+
+    if current_mix == new_mix do
+      Utils.puts("WARNING: Installing deps didn't change mix_exs")
+    end
 
     config =
       Config.set(
         config,
         :mix_exs,
-        Regex.replace(
-          ~r/defp deps do.*?\n.*?\[/,
-          Config.get(config, :mix_exs),
-          "defp deps do\n    [{:#{dep}, \"#{new_version}\"#{dep_opts_str}},"
-        )
+        new_mix
       )
 
     {:yes, config}
@@ -130,9 +138,25 @@ defmodule Ironman.Utils.Deps do
     Utils.puts("Upgrading #{dep} from #{configured_version} to #{available_version}")
     new_version = "~> #{available_version}"
     regex = Regex.compile!("{:#{dep}, \"~>.*?\"")
+    current_mix = Config.get(config, :mix_exs)
+    new_mix = Regex.replace(regex, current_mix, "{:#{dep}, \"#{new_version}\"")
 
-    config =
-      Config.set(config, :mix_exs, Regex.replace(regex, Config.get(config, :mix_exs), "{:#{dep}, \"#{new_version}\""))
+    new_mix =
+      if current_mix != new_mix do
+        new_mix
+      else
+        regex = Regex.compile!("{:#{dep}, \".*?\"")
+        current_mix = Config.get(config, :mix_exs)
+        new_mix = Regex.replace(regex, current_mix, "{:#{dep}, \"#{new_version}\"")
+
+        if current_mix == new_mix do
+          Utils.puts("WARNING: Upgrade of #{dep} did not change mix.exs")
+        end
+
+        new_mix
+      end
+
+    config = Config.set(config, :mix_exs, new_mix)
 
     {:yes, config}
   end
@@ -144,15 +168,26 @@ defmodule Ironman.Utils.Deps do
   end
 
   def get_installed_deps(%Config{} = config) do
-    deps_str =
-      "defp deps do\\s*?\\[\\s*?({.*?})\\s*?]\\s*?end"
-      |> Regex.compile!("s")
-      |> Regex.run(Config.get(config, :mix_exs))
-      |> Enum.at(1)
+    "defp deps do\\s*?\\[\\s*?({.*?})\\s*?]\\s*?end"
+    |> Regex.compile!("s")
+    |> Regex.run(Config.get(config, :mix_exs) |> remove_comments())
+    |> case do
+      nil ->
+        []
 
-    "{:([a-z_]*)"
-    |> Regex.compile!()
-    |> Regex.scan(deps_str)
-    |> Enum.map(&Enum.at(&1, 1))
+      deps_ret ->
+        deps_str = Enum.at(deps_ret, 1)
+
+        "{:([a-z_]*)"
+        |> Regex.compile!()
+        |> Regex.scan(deps_str)
+        |> Enum.map(&Enum.at(&1, 1))
+    end
+  end
+
+  def remove_comments(str) do
+    "^\\s*#.*$\n*"
+    |> Regex.compile!("m")
+    |> Regex.replace(str, "")
   end
 end
