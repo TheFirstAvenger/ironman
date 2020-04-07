@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+
+* Remove earmark check (it is now a dependency of :ex_doc)
+
 ## 0.4.3
 
 * Add check to update all outdated installed dependencies.

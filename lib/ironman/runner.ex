@@ -5,7 +5,6 @@ defmodule Ironman.Runner do
 
   @checks [
     :ex_doc,
-    :earmark,
     :dialyxir,
     :mix_test_watch,
     :credo,
@@ -42,9 +41,6 @@ defmodule Ironman.Runner do
   @spec run_check(Config.t(), atom()) :: Config.t()
   def run_check(%Config{} = config, :ex_doc),
     do: config |> SimpleDep.run(:ex_doc, only: :dev, runtime: false) |> unwrap(:ex_doc)
-
-  def run_check(%Config{} = config, :earmark),
-    do: config |> SimpleDep.run(:earmark, only: :dev, runtime: false) |> unwrap(:earmark)
 
   def run_check(%Config{} = config, :dialyxir),
     do: config |> SimpleDep.run(:dialyxir, only: :dev, runtime: false) |> unwrap(:dialyxir)

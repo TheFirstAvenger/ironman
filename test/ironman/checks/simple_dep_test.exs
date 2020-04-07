@@ -39,18 +39,18 @@ defmodule Ironman.Checks.SimpleDepTest do
     test "multiple" do
       MoxHelpers.expect_dep_http(:ex_doc, "1.2.3")
       MoxHelpers.expect_io("\nUpgrade ex_doc from ~> 1.2.2 to 1.2.3? [Yn] ", "y")
-      MoxHelpers.expect_dep_http(:earmark, "2.3.6")
-      MoxHelpers.expect_io("\nUpgrade earmark from ~> 2.3.4 to 2.3.6? [Yn] ", "y")
+      MoxHelpers.expect_dep_http(:credo, "2.3.6")
+      MoxHelpers.expect_io("\nUpgrade credo from ~> 2.3.4 to 2.3.6? [Yn] ", "y")
 
-      %Config{} = config = ConfigFactory.with_deps(ex_doc: "~> 1.2.2", earmark: "~> 2.3.4")
+      %Config{} = config = ConfigFactory.with_deps(ex_doc: "~> 1.2.2", credo: "~> 2.3.4")
 
       assert "~> 1.2.2" == Deps.get_configured_version(config, :ex_doc)
-      assert "~> 2.3.4" == Deps.get_configured_version(config, :earmark)
+      assert "~> 2.3.4" == Deps.get_configured_version(config, :credo)
       assert {:yes, %Config{} = config} = SimpleDep.run(config, :ex_doc)
-      assert {:yes, %Config{} = config} = SimpleDep.run(config, :earmark)
+      assert {:yes, %Config{} = config} = SimpleDep.run(config, :credo)
 
       assert "~> 1.2.3" == Deps.get_configured_version(config, :ex_doc)
-      assert "~> 2.3.6" == Deps.get_configured_version(config, :earmark)
+      assert "~> 2.3.6" == Deps.get_configured_version(config, :credo)
     end
   end
 
@@ -79,18 +79,18 @@ defmodule Ironman.Checks.SimpleDepTest do
     test "multiple" do
       MoxHelpers.expect_dep_http(:ex_doc, "1.2.3")
       MoxHelpers.expect_io("\nInstall ex_doc 1.2.3? [Yn] ", "y")
-      MoxHelpers.expect_dep_http(:earmark, "2.3.6")
-      MoxHelpers.expect_io("\nInstall earmark 2.3.6? [Yn] ", "y")
+      MoxHelpers.expect_dep_http(:credo, "2.3.6")
+      MoxHelpers.expect_io("\nInstall credo 2.3.6? [Yn] ", "y")
 
       %Config{} = config = ConfigFactory.with_deps()
 
       assert nil == Deps.get_configured_version(config, :ex_doc)
-      assert nil == Deps.get_configured_version(config, :earmark)
+      assert nil == Deps.get_configured_version(config, :credo)
       assert {:yes, %Config{} = config} = SimpleDep.run(config, :ex_doc)
-      assert {:yes, %Config{} = config} = SimpleDep.run(config, :earmark)
+      assert {:yes, %Config{} = config} = SimpleDep.run(config, :credo)
 
       assert "~> 1.2.3" == Deps.get_configured_version(config, :ex_doc)
-      assert "~> 2.3.6" == Deps.get_configured_version(config, :earmark)
+      assert "~> 2.3.6" == Deps.get_configured_version(config, :credo)
     end
 
     test "Sets dep_opts" do

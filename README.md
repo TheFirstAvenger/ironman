@@ -33,7 +33,7 @@ Contributions welcome. Specifically looking to:
 ### Add Dependencies
 
 * [X] [`:ex_doc`](https://github.com/elixir-lang/ex_doc)
-* [X] [`:earmark`](https://github.com/pragdave/earmark)
+* ~~[X] [`:earmark`~](https://github.com/pragdave/earmark)~~ Now a dependency of `:ex_doc`
 * [X] [`:dialyxir`](https://github.com/jeremyjh/dialyxir)
 * [X] [`:mix_test_watch`](https://github.com/lpil/mix-test.watch)
 * [X] [`:credo`](https://github.com/rrrene/credo)
