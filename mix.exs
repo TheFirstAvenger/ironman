@@ -37,13 +37,12 @@ defmodule Ironman.MixProject do
   defp deps do
     [
       {:git_hooks, "~> 0.4.1", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.10.5", only: :test},
-      {:credo, "~> 1.4.0-rc.1", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.19.3", only: :dev, runtime: false},
-      {:mix_test_watch, "~> 0.9.0", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.12.3", only: :test},
+      {:credo, "~> 1.4.0-rc.2", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.21.3", only: :dev, runtime: false},
+      {:mix_test_watch, "~> 1.0.2", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
-      {:earmark, "~> 1.3.1", only: :dev, runtime: false},
-      {:mox, "~> 0.5.0", only: :test}
+      {:mox, "~> 0.5.2", only: :test}
     ]
   end
 
