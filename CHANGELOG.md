@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## 0.4.5
 
 * Update git hooks config to new syntax
 
