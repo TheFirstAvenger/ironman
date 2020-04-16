@@ -6,17 +6,17 @@ config :git_hooks,
   hooks: [
     pre_commit: [
       verbose: true,
-      mix_tasks: [
-        "format --check-formatted --dry-run --check-equivalent"
+      tasks: [
+        "mix format --check-formatted --dry-run --check-equivalent"
       ]
     ],
     pre_push: [
       verbose: true,
-      mix_tasks: [
-        "clean",
-        "compile --warnings-as-errors",
-        "credo --strict",
-        "dialyzer --halt-exit-status"
+      tasks: [
+        "mix clean",
+        "mix compile --warnings-as-errors",
+        "mix credo --strict",
+        "mix dialyzer --halt-exit-status"
       ]
     ]
   ]
