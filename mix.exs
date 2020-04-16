@@ -36,7 +36,7 @@ defmodule Ironman.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:git_hooks, "~> 0.2.0", only: :test},
+      {:git_hooks, "~> 0.4.1", only: :dev, runtime: false},
       {:excoveralls, "~> 0.10.5", only: :test},
       {:credo, "~> 1.4.0-rc.1", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.19.3", only: :dev, runtime: false},

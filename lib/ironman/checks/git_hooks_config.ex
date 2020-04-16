@@ -95,14 +95,14 @@ defmodule Ironman.Checks.GitHooksConfig do
 
     tasks =
       if Deps.get_configured_version(config, :credo) do
-        tasks <> "\n            \"credo --strict\","
+        tasks <> "\n            \"mix credo --strict\","
       else
         tasks
       end
 
     tasks =
       if Deps.get_configured_version(config, :dialyxir) do
-        tasks <> "\n            \"dialyzer --halt-exit-status\","
+        tasks <> "\n            \"mix dialyzer --halt-exit-status\","
       else
         tasks
       end
@@ -112,15 +112,15 @@ defmodule Ironman.Checks.GitHooksConfig do
       hooks: [
         pre_commit: [
           verbose: true,
-          mix_tasks: [
-            "format --check-formatted --dry-run --check-equivalent"
+          tasks: [
+            "mix format --check-formatted --dry-run --check-equivalent"
           ]
         ],
         pre_push: [
           verbose: true,
-          mix_tasks: [
-            "clean",
-            "compile --warnings-as-errors",#{tasks}
+          tasks: [
+            "mix clean",
+            "mix compile --warnings-as-errors",#{tasks}
           ]
         ]
       ]

@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+
+* Update git hooks config to new syntax
+
 ## 0.4.4
 
 * Better handling of comments in deps detection, install, and update
