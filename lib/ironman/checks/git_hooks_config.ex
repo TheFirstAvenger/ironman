@@ -102,7 +102,7 @@ defmodule Ironman.Checks.GitHooksConfig do
 
     tasks =
       if Deps.get_configured_version(config, :dialyxir) do
-        tasks <> "\n            \"mix dialyzer --halt-exit-status\","
+        tasks <> "\n            \"mix dialyzer\","
       else
         tasks
       end

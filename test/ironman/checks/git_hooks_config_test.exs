@@ -62,7 +62,7 @@ defmodule Ironman.Checks.GitHooksConfigTest do
       assert "use Mix.Config\n\n" = Config.get(config2, :config_exs)
       assert String.starts_with?(Config.get(config2, :config_dev_exs), "use Mix.Config\n\n\n\nconfig :git_hooks,")
       refute String.contains?(Config.get(config2, :config_dev_exs), "credo --strict")
-      refute String.contains?(Config.get(config2, :config_dev_exs), "dialyzer --halt-exit-status")
+      refute String.contains?(Config.get(config2, :config_dev_exs), "dialyzer")
       assert "use Mix.Config\n\n" = Config.get(config2, :config_test_exs)
       assert "use Mix.Config\n\n" = Config.get(config2, :config_prod_exs)
     end
@@ -78,7 +78,7 @@ defmodule Ironman.Checks.GitHooksConfigTest do
     assert "use Mix.Config\n\n" = Config.get(config2, :config_exs)
     assert String.starts_with?(Config.get(config2, :config_dev_exs), "use Mix.Config\n\nconfig :git_hooks,")
     assert String.contains?(Config.get(config2, :config_dev_exs), "credo --strict")
-    refute String.contains?(Config.get(config2, :config_dev_exs), "dialyzer --halt-exit-status")
+    refute String.contains?(Config.get(config2, :config_dev_exs), "dialyzer")
     assert "use Mix.Config\n\n" = Config.get(config2, :config_test_exs)
     assert "use Mix.Config\n\n" = Config.get(config2, :config_prod_exs)
   end
@@ -93,7 +93,7 @@ defmodule Ironman.Checks.GitHooksConfigTest do
     assert "use Mix.Config\n\n" = Config.get(config2, :config_exs)
     assert String.starts_with?(Config.get(config2, :config_dev_exs), "use Mix.Config\n\nconfig :git_hooks,")
     refute String.contains?(Config.get(config2, :config_dev_exs), "credo --strict")
-    assert String.contains?(Config.get(config2, :config_dev_exs), "dialyzer --halt-exit-status")
+    assert String.contains?(Config.get(config2, :config_dev_exs), "dialyzer")
     assert "use Mix.Config\n\n" = Config.get(config2, :config_test_exs)
     assert "use Mix.Config\n\n" = Config.get(config2, :config_prod_exs)
   end
