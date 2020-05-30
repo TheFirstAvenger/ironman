@@ -43,11 +43,17 @@ defmodule Ironman.Checks.GitHooksConfig do
     config_exs = Config.get(config, :config_exs)
 
     config_exs =
-      if Regex.match?(~r/#\s+import_config "\#{Mix.env\(\)}.exs"/, config_exs) do
-        Utils.puts("Uncommenting import_config in config.exs")
-        Regex.replace(~r/#\s+import_config "\#{Mix.env\(\)}.exs"/, config_exs, "import_config \"\#{Mix.env()}.exs\"")
-      else
-        config_exs
+      cond do
+        config_exs == nil ->
+          Utils.puts("Adding config/config.exs")
+          "import Config\n\nimport_config \"\#{Mix.env()}.exs\""
+
+        Regex.match?(~r/#\s+import_config "\#{Mix.env\(\)}.exs"/, config_exs) ->
+          Utils.puts("Uncommenting import_config in config.exs")
+          Regex.replace(~r/#\s+import_config "\#{Mix.env\(\)}.exs"/, config_exs, "import_config \"\#{Mix.env()}.exs\"")
+
+        true ->
+          config_exs
       end
 
     Config.set(config, :config_exs, config_exs)
