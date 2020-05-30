@@ -66,6 +66,27 @@ defmodule Ironman.Checks.GitHooksConfigTest do
       assert "use Mix.Config\n\n" = Config.get(config2, :config_test_exs)
       assert "use Mix.Config\n\n" = Config.get(config2, :config_prod_exs)
     end
+
+    test "runs when config not present - config directory not present" do
+      config =
+        ConfigFactory.with_deps(git_hooks: "~> 1.2.3")
+        |> Config.set(:config_exs, nil)
+        |> Config.set(:config_dev_exs, "use Mix.Config\n\n")
+        |> Config.set(:config_test_exs, "use Mix.Config\n\n")
+        |> Config.set(:config_prod_exs, "use Mix.Config\n\n")
+
+      MoxHelpers.expect_io("\nAdd git_hooks config to project? [Yn] ", "Y")
+      MoxHelpers.expect_directory_create("config")
+      MoxHelpers.expect_file_touch!("config/config.exs")
+
+      {:yes, config2} = GitHooksConfig.run(config)
+      assert "use Mix.Config\n\nimport_config \"\#{Mix.env()}.exs\"\n" = Config.get(config2, :config_exs)
+      assert String.starts_with?(Config.get(config2, :config_dev_exs), "use Mix.Config\n\n\n\nconfig :git_hooks,")
+      refute String.contains?(Config.get(config2, :config_dev_exs), "credo --strict")
+      refute String.contains?(Config.get(config2, :config_dev_exs), "dialyzer")
+      assert "use Mix.Config\n\n" = Config.get(config2, :config_test_exs)
+      assert "use Mix.Config\n\n" = Config.get(config2, :config_prod_exs)
+    end
   end
 
   test "includes credo line when credo dep exists" do

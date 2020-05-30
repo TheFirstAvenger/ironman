@@ -2,6 +2,7 @@ defmodule Ironman.Checks.GitHooksConfig do
   @moduledoc false
   alias Ironman.{Config, Utils}
   alias Ironman.Utils.Deps
+  alias Ironman.Utils.File, as: IFile
 
   @spec run(Config.t()) :: {:error, any()} | {:no | :yes | :up_to_date | :skip, Config.t()}
   def run(%Config{} = config) do
@@ -31,12 +32,30 @@ defmodule Ironman.Checks.GitHooksConfig do
   defp do_add_config(%Config{} = config) do
     config =
       config
+      |> maybe_create_config()
       |> set_config_exs()
       |> set_config_dev_exs()
       |> set_config_prod_exs()
       |> set_config_test_exs()
 
     {:yes, config}
+  end
+
+  defp maybe_create_config(config) do
+    config_exs =
+      case Config.get(config, :config_exs) do
+        nil ->
+          Utils.puts("Adding config/config.exs")
+          IFile.mkdir!("config")
+          IFile.touch!("config/config.exs")
+
+          "use Mix.Config\n\nimport_config \"\#{Mix.env()}.exs\"\n"
+
+        config_exs ->
+          config_exs
+      end
+
+    Config.set(config, :config_exs, config_exs)
   end
 
   defp set_config_exs(config) do
