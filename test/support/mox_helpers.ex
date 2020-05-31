@@ -44,4 +44,14 @@ defmodule Ironman.Test.Helpers.MoxHelpers do
     Ironman.MockFile
     |> expect(:write!, fn ^file, ^contents -> :ok end)
   end
+
+  def expect_file_write!(file) do
+    Ironman.MockFile
+    |> expect(:write!, fn ^file, _contents -> :ok end)
+  end
+
+  def expect_mkdir_p!(path) do
+    Ironman.MockFile
+    |> expect(:mkdir_p!, fn ^path -> :ok end)
+  end
 end

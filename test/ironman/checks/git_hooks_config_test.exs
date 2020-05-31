@@ -3,7 +3,9 @@ defmodule Ironman.Checks.GitHooksConfigTest do
 
   alias Ironman.Checks.GitHooksConfig
   alias Ironman.Config
-  alias Ironman.Test.Helpers.{ConfigFactory, MoxHelpers}
+  alias Ironman.Test.Helpers.ConfigFactory
+  alias Ironman.Test.Helpers.MoxHelpers
+  alias Ironman.Utils
 
   describe "run" do
     test "skips when git_hooks not present" do
@@ -65,6 +67,28 @@ defmodule Ironman.Checks.GitHooksConfigTest do
       refute String.contains?(Config.get(config2, :config_dev_exs), "dialyzer")
       assert "use Mix.Config\n\n" = Config.get(config2, :config_test_exs)
       assert "use Mix.Config\n\n" = Config.get(config2, :config_prod_exs)
+    end
+
+    test "runs when no config directry exists" do
+      config =
+        ConfigFactory.with_deps(git_hooks: "~> 1.2.3")
+        |> Config.set(:config_exs, nil, false)
+
+      MoxHelpers.expect_io("\nAdd git_hooks config to project? [Yn] ", "Y")
+
+      {:yes, config2} = GitHooksConfig.run(config)
+      assert "import Config\n\nimport_config \"\#{Mix.env()}.exs\"" == Config.get(config2, :config_exs)
+
+      MoxHelpers.expect_mkdir_p!("config")
+      MoxHelpers.expect_file_write!("config/config.exs", "import Config\n\nimport_config \"\#{Mix.env()}.exs\"")
+      MoxHelpers.expect_mkdir_p!("config")
+      MoxHelpers.expect_file_write!("config/dev.exs")
+      MoxHelpers.expect_mkdir_p!("config")
+      MoxHelpers.expect_file_write!("config/test.exs")
+      MoxHelpers.expect_mkdir_p!("config")
+      MoxHelpers.expect_file_write!("config/prod.exs")
+
+      :ok = Utils.write_changes(config2)
     end
   end
 

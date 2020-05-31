@@ -143,6 +143,8 @@ defmodule Ironman.Utils do
     write_if_changed(config, :config_prod_exs)
     write_if_changed(config, :coveralls_json)
     write_if_changed(config, :credo_exs)
+
+    :ok
   end
 
   @spec write_if_changed(Config.t(), atom()) :: :ok
@@ -150,6 +152,7 @@ defmodule Ironman.Utils do
     if Config.changed?(config, key) do
       file = path_of(key)
       puts("Writing new #{file}...")
+      IFile.mkdir_p!(Path.dirname(file))
       IFile.write!(file, Config.get(config, key))
     end
   end
