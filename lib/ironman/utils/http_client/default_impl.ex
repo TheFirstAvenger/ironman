@@ -12,7 +12,7 @@ defmodule Ironman.Utils.HttpClient.DefaultImpl do
 
     case :httpc.request(
            :get,
-           {String.to_charlist(url), [{'User-Agent', user_agent()}, {'Accept', 'application/vnd.hex+erlang'}]},
+           {String.to_charlist(url), [{~c"User-Agent", user_agent()}, {~c"Accept", ~c"application/vnd.hex+erlang"}]},
            [],
            []
          ) do
@@ -23,6 +23,6 @@ defmodule Ironman.Utils.HttpClient.DefaultImpl do
   end
 
   defp user_agent do
-    'Ironman/#{Deps.ironman_version()} (Elixir/#{System.version()}) (OTP/#{System.otp_release()})'
+    ~c"Ironman/#{Deps.ironman_version()} (Elixir/#{System.version()}) (OTP/#{System.otp_release()})"
   end
 end

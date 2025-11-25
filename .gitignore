@@ -26,3 +26,5 @@ ironman-*.tar
 
 /priv/plts/*.plt
 /priv/plts/*.plt.hash
+
+.claude/

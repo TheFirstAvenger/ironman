@@ -5,7 +5,7 @@ defmodule Ironman.MixProject do
     [
       app: :ironman,
       version: "0.4.6",
-      elixir: "~> 1.8",
+      elixir: "~> 1.16",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
@@ -36,13 +36,13 @@ defmodule Ironman.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:git_hooks, "~> 0.4.1", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.12.3", only: :test},
-      {:credo, "~> 1.4.0-rc.2", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.21.3", only: :dev, runtime: false},
-      {:mix_test_watch, "~> 1.0.2", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
-      {:mox, "~> 0.5.2", only: :test}
+      {:git_hooks, "~> 0.6", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.18", only: :test},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
+      {:mix_test_watch, "~> 1.2", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:mox, "~> 1.1", only: :test}
     ]
   end
 

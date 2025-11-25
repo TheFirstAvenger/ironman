@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :ironman,
   hex_repo: "https://hex.pm",
