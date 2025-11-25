@@ -1,5 +1,9 @@
 # Changelog
 
+## Next
+
+- Update Elixir and Erlang versions
+
 ## 0.4.6
 
 - Add :inets

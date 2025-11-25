@@ -1,18 +1,13 @@
 language: elixir
 elixir:
-  - 1.9.4
-  - 1.10.4
-  - 1.11.2
+  - 1.18.2
+  - 1.17.4
 otp_release:
-  - 22.3.4
-  - 23.0.1
+  - 27.2.2
+  - 26.3.6
 env:
   - MIX_ENV=test
 sudo: false
-matrix:
-  exclude:
-    - elixir: 1.9.4
-      otp_release: 23.0.1
 before_script:
   - mix format --check-formatted
   - mix compile --warnings-as-errors
