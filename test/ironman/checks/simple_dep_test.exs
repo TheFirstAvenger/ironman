@@ -1,8 +1,10 @@
 defmodule Ironman.Checks.SimpleDepTest do
   use ExUnit.Case
+
   alias Ironman.Checks.SimpleDep
   alias Ironman.Config
-  alias Ironman.Test.Helpers.{ConfigFactory, MoxHelpers}
+  alias Ironman.Test.Helpers.ConfigFactory
+  alias Ironman.Test.Helpers.MoxHelpers
   alias Ironman.Utils.Deps
 
   describe "up to date" do

@@ -11,47 +11,38 @@ defmodule Ironman.Test.Helpers.MoxHelpers do
   end
 
   def expect_http(url, ret) do
-    Ironman.MockHttpClient
-    |> expect(:get_body_as_term, fn ^url -> {:ok, ret} end)
+    expect(Ironman.MockHttpClient, :get_body_as_term, fn ^url -> {:ok, ret} end)
   end
 
   def expect_http_not_found(url) do
-    Ironman.MockHttpClient
-    |> expect(:get_body_as_term, fn ^url -> {:error, :not_found} end)
+    expect(Ironman.MockHttpClient, :get_body_as_term, fn ^url -> {:error, :not_found} end)
   end
 
   def expect_io(expect, return) do
-    Ironman.MockIO
-    |> expect(:get, fn ^expect -> "#{return}\n" end)
+    expect(Ironman.MockIO, :get, fn ^expect -> "#{return}\n" end)
   end
 
   def expect_cmd(expect, return \\ {:ok, "all good"}) do
-    Ironman.MockCmd
-    |> expect(:run, fn ^expect -> return end)
+    expect(Ironman.MockCmd, :run, fn ^expect -> return end)
   end
 
   def expect_file_exists?(file, exists? \\ true) do
-    Ironman.MockFile
-    |> expect(:exists?, fn ^file -> exists? end)
+    expect(Ironman.MockFile, :exists?, fn ^file -> exists? end)
   end
 
   def expect_file_read!(file, content) do
-    Ironman.MockFile
-    |> expect(:read!, fn ^file -> content end)
+    expect(Ironman.MockFile, :read!, fn ^file -> content end)
   end
 
   def expect_file_write!(file, contents) do
-    Ironman.MockFile
-    |> expect(:write!, fn ^file, ^contents -> :ok end)
+    expect(Ironman.MockFile, :write!, fn ^file, ^contents -> :ok end)
   end
 
   def expect_file_write!(file) do
-    Ironman.MockFile
-    |> expect(:write!, fn ^file, _contents -> :ok end)
+    expect(Ironman.MockFile, :write!, fn ^file, _contents -> :ok end)
   end
 
   def expect_mkdir_p!(path) do
-    Ironman.MockFile
-    |> expect(:mkdir_p!, fn ^path -> :ok end)
+    expect(Ironman.MockFile, :mkdir_p!, fn ^path -> :ok end)
   end
 end

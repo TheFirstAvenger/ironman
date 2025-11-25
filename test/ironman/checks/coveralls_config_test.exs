@@ -3,7 +3,8 @@ defmodule Ironman.Checks.CoverallsConfigTest do
 
   alias Ironman.Checks.CoverallsConfig
   alias Ironman.Config
-  alias Ironman.Test.Helpers.{ConfigFactory, MoxHelpers}
+  alias Ironman.Test.Helpers.ConfigFactory
+  alias Ironman.Test.Helpers.MoxHelpers
 
   describe "run" do
     test "skips when coveralls not present" do
@@ -36,7 +37,7 @@ defmodule Ironman.Checks.CoverallsConfigTest do
 
       assert String.contains?(
                Config.get(config2, :mix_exs),
-               "preferred_cli_env: [coveralls: :test, \"coveralls.detail\": :test, \"coveralls.post\": :test, \"coveralls.html\": :test]"
+               ~s(preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test])
              )
 
       assert Config.get(config2, :coveralls_json) == "{\n  \"skip_files\": []\n}"
@@ -44,7 +45,8 @@ defmodule Ironman.Checks.CoverallsConfigTest do
 
     test "runs when config not present but coveralls.json present" do
       config =
-        ConfigFactory.with_deps(excoveralls: "~> 1.2.3")
+        [excoveralls: "~> 1.2.3"]
+        |> ConfigFactory.with_deps()
         |> Config.set(:coveralls_json, "existing coveralls config")
 
       refute Config.get(config, :starting_project_config)[:test_coverage]
@@ -56,7 +58,7 @@ defmodule Ironman.Checks.CoverallsConfigTest do
 
       assert String.contains?(
                Config.get(config2, :mix_exs),
-               "preferred_cli_env: [coveralls: :test, \"coveralls.detail\": :test, \"coveralls.post\": :test, \"coveralls.html\": :test]"
+               ~s(preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test])
              )
 
       assert Config.get(config2, :coveralls_json) == "existing coveralls config"

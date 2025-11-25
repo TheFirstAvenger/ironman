@@ -1,7 +1,5 @@
 import Config
 
-config :ironman, hex_repo: "https://hex.pm"
-
 config :git_hooks,
   hooks: [
     pre_commit: [
@@ -20,3 +18,5 @@ config :git_hooks,
       ]
     ]
   ]
+
+config :ironman, hex_repo: "https://hex.pm"

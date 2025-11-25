@@ -52,7 +52,8 @@ defmodule Ironman.MixProject do
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
       {:mix_test_watch, "~> 1.2", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:mox, "~> 1.1", only: :test}
+      {:mox, "~> 1.1", only: :test},
+      {:styler, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
 

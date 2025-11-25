@@ -3,7 +3,8 @@ defmodule Ironman.Checks.DialyzerConfigTest do
 
   alias Ironman.Checks.DialyzerConfig
   alias Ironman.Config
-  alias Ironman.Test.Helpers.{ConfigFactory, MoxHelpers}
+  alias Ironman.Test.Helpers.ConfigFactory
+  alias Ironman.Test.Helpers.MoxHelpers
 
   describe "run" do
     test "skips when dialyxir not present" do

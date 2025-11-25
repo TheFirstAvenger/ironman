@@ -1,7 +1,14 @@
 defmodule Ironman.Runner do
   @moduledoc false
-  alias Ironman.Checks.{AddDeps, CoverallsConfig, CredoConfig, DialyzerConfig, GitHooksConfig, SimpleDep, UpdateAllDeps}
-  alias Ironman.{Config, Utils}
+  alias Ironman.Checks.AddDeps
+  alias Ironman.Checks.CoverallsConfig
+  alias Ironman.Checks.CredoConfig
+  alias Ironman.Checks.DialyzerConfig
+  alias Ironman.Checks.GitHooksConfig
+  alias Ironman.Checks.SimpleDep
+  alias Ironman.Checks.UpdateAllDeps
+  alias Ironman.Config
+  alias Ironman.Utils
 
   @checks [
     :ex_doc,
@@ -57,23 +64,17 @@ defmodule Ironman.Runner do
   def run_check(%Config{} = config, :git_hooks),
     do: config |> SimpleDep.run(:git_hooks, only: :dev, runtime: false) |> unwrap(:git_hooks)
 
-  def run_check(%Config{} = config, :dialyzer_config),
-    do: config |> DialyzerConfig.run() |> unwrap(:dialyzer_config)
+  def run_check(%Config{} = config, :dialyzer_config), do: config |> DialyzerConfig.run() |> unwrap(:dialyzer_config)
 
-  def run_check(%Config{} = config, :git_hooks_config),
-    do: config |> GitHooksConfig.run() |> unwrap(:git_hooks_config)
+  def run_check(%Config{} = config, :git_hooks_config), do: config |> GitHooksConfig.run() |> unwrap(:git_hooks_config)
 
-  def run_check(%Config{} = config, :coveralls_config),
-    do: config |> CoverallsConfig.run() |> unwrap(:coveralls_config)
+  def run_check(%Config{} = config, :coveralls_config), do: config |> CoverallsConfig.run() |> unwrap(:coveralls_config)
 
-  def run_check(%Config{} = config, :credo_exs),
-    do: config |> CredoConfig.run() |> unwrap(:credo_exs)
+  def run_check(%Config{} = config, :credo_exs), do: config |> CredoConfig.run() |> unwrap(:credo_exs)
 
-  def run_check(%Config{} = config, :update_all_deps),
-    do: config |> UpdateAllDeps.run() |> unwrap(:update_all_deps)
+  def run_check(%Config{} = config, :update_all_deps), do: config |> UpdateAllDeps.run() |> unwrap(:update_all_deps)
 
-  def run_check(%Config{} = config, :add_deps),
-    do: config |> AddDeps.run() |> unwrap(:add_deps)
+  def run_check(%Config{} = config, :add_deps), do: config |> AddDeps.run() |> unwrap(:add_deps)
 
   @spec unwrap({atom(), Config.t()} | {:error, any()}, atom()) :: Config.t()
   def unwrap({:no, config}, _check), do: config

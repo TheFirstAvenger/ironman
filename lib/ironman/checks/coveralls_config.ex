@@ -1,6 +1,7 @@
 defmodule Ironman.Checks.CoverallsConfig do
   @moduledoc false
-  alias Ironman.{Config, Utils}
+  alias Ironman.Config
+  alias Ironman.Utils
   alias Ironman.Utils.Deps
 
   @spec run(Config.t()) :: {:error, any()} | {:no | :yes | :up_to_date | :skip, Config.t()}

@@ -1,7 +1,9 @@
 defmodule Ironman.Checks.AddDepsTest do
   use ExUnit.Case
+
   alias Ironman.Checks.AddDeps
-  alias Ironman.Test.Helpers.{ConfigFactory, MoxHelpers}
+  alias Ironman.Test.Helpers.ConfigFactory
+  alias Ironman.Test.Helpers.MoxHelpers
   alias Ironman.Utils.Deps
 
   describe "run" do

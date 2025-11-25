@@ -7,7 +7,7 @@ defmodule Ironman.Utils.DepsTest do
   describe "get_installed_deps/1" do
     test "returns correct deps" do
       config =
-        """
+        build_config_with_mix_exs("""
         defmodule MyApp.MixProject
           defp deps do
             [
@@ -16,15 +16,14 @@ defmodule Ironman.Utils.DepsTest do
             ]
           end
         end
-        """
-        |> build_config_with_mix_exs()
+        """)
 
       assert ["foo", "bar"] == Deps.get_installed_deps(config)
     end
 
     test "returns correct deps with comments" do
       config =
-        """
+        build_config_with_mix_exs("""
         defmodule MyApp.MixProject
           defp deps do
             # This is a comment
@@ -35,15 +34,14 @@ defmodule Ironman.Utils.DepsTest do
             ]
           end
         end
-        """
-        |> build_config_with_mix_exs()
+        """)
 
       assert ["foo", "bar"] == Deps.get_installed_deps(config)
     end
 
     test "returns correct deps with mix new defaults" do
       config =
-        """
+        build_config_with_mix_exs("""
         defmodule MyApp.MixProject
           defp deps do
             [
@@ -52,22 +50,20 @@ defmodule Ironman.Utils.DepsTest do
             ]
           end
         end
-        """
-        |> build_config_with_mix_exs()
+        """)
 
       assert [] == Deps.get_installed_deps(config)
     end
 
     test "returns correct deps with empty deps" do
       config =
-        """
+        build_config_with_mix_exs("""
         defmodule MyApp.MixProject
           defp deps do
             []
           end
         end
-        """
-        |> build_config_with_mix_exs()
+        """)
 
       assert [] == Deps.get_installed_deps(config)
     end

@@ -1,6 +1,7 @@
 defmodule Ironman.Checks.DialyzerConfig do
   @moduledoc false
-  alias Ironman.{Config, Utils}
+  alias Ironman.Config
+  alias Ironman.Utils
   alias Ironman.Utils.Deps
 
   @spec run(Config.t()) :: {:error, any()} | {:no | :yes | :up_to_date | :skip, Config.t()}
@@ -69,25 +70,25 @@ defmodule Ironman.Checks.DialyzerConfig do
 
   defp add_plt_to_gitignore(config) do
     app_name = Config.app_name(config)
+    gitignore = Config.get(config, :gitignore)
 
-    case Config.get(config, :gitignore) do
-      nil ->
+    cond do
+      is_nil(gitignore) ->
         Utils.puts("Creating .gitignore with #{app_name}.plt")
         Config.set(config, :gitignore, "# dialyzer plt for CI caching\n#{app_name}.plt\n")
 
-      gitignore ->
-        if String.contains?(gitignore, "#{app_name}.plt") do
-          config
-        else
-          Utils.puts("Adding #{app_name}.plt to .gitignore")
-          newlines = if String.ends_with?(gitignore, "\n"), do: "", else: "\n\n"
+      String.contains?(gitignore, "#{app_name}.plt") ->
+        config
 
-          Config.set(
-            config,
-            :gitignore,
-            "#{gitignore}#{newlines}# dialyzer plt\n#{app_name}.plt\n#{app_name}.plt.hash\n"
-          )
-        end
+      true ->
+        Utils.puts("Adding #{app_name}.plt to .gitignore")
+        newlines = if String.ends_with?(gitignore, "\n"), do: "", else: "\n\n"
+
+        Config.set(
+          config,
+          :gitignore,
+          "#{gitignore}#{newlines}# dialyzer plt\n#{app_name}.plt\n#{app_name}.plt.hash\n"
+        )
     end
   end
 
