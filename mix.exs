@@ -54,7 +54,7 @@ defmodule Ironman.MixProject do
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:mox, "~> 1.1", only: :test},
       {:styler, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:sourceror, "~> 1.7"}
+      {:sourceror, "~> 1.10"}
     ]
   end
 
