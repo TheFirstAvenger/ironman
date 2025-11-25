@@ -2,7 +2,7 @@ name: Elixir CI
 
 on:
   pull_request:
-    branches: [main]
+    branches: [master]
 env:
   MIX_ENV: test
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
