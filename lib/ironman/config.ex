@@ -47,6 +47,11 @@ defmodule Ironman.Config do
             changed: MapSet.new(),
             skipped_upgrades: MapSet.new()
 
+  @spec new(keyword()) :: t()
+  def new(attrs \\ []) do
+    struct!(__MODULE__, attrs)
+  end
+
   def new! do
     %__MODULE__{
       mix_exs: file_or_nil(Utils.path_of(:mix_exs)),
