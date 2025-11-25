@@ -65,7 +65,7 @@ defmodule Ironman.Checks.GitHooksConfig do
       case Config.get(config, :config_dev_exs) do
         nil ->
           Utils.puts("Adding config/dev.exs")
-          "use Mix.Config\n\n" <> git_hooks_config(config)
+          "import Config\n\n" <> git_hooks_config(config)
 
         config_dev_exs ->
           Utils.puts("Adding git_hooks_config to config/dev.exs")
@@ -79,7 +79,7 @@ defmodule Ironman.Checks.GitHooksConfig do
     case Config.get(config, :config_test_exs) do
       nil ->
         Utils.puts("Adding config/test.exs")
-        Config.set(config, :config_test_exs, "use Mix.Config\n\n")
+        Config.set(config, :config_test_exs, "import Config\n\n")
 
       _ ->
         config
@@ -90,7 +90,7 @@ defmodule Ironman.Checks.GitHooksConfig do
     case Config.get(config, :config_prod_exs) do
       nil ->
         Utils.puts("Adding config/prod.exs")
-        Config.set(config, :config_prod_exs, "use Mix.Config\n\n")
+        Config.set(config, :config_prod_exs, "import Config\n\n")
 
       _ ->
         config

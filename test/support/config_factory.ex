@@ -31,7 +31,7 @@ defmodule Ironman.Test.Helpers.ConfigFactory do
     [starting_project_config: [app: :test]]
     |> Config.new()
     |> Config.set(:mix_exs, mix_exs, false)
-    |> Config.set(:config_exs, "use Mix.Config\n\n", false)
+    |> Config.set(:config_exs, "import Config\n\n", false)
   end
 
   def with_dialyzer_config do
@@ -112,7 +112,7 @@ defmodule Ironman.Test.Helpers.ConfigFactory do
   def with_git_hooks_config do
     [git_hooks: "1.2.3"]
     |> with_deps()
-    |> Config.set(:config_dev_exs, "use Mix.Config\n\nconfig :git_hooks,", false)
+    |> Config.set(:config_dev_exs, "import Config\n\nconfig :git_hooks,", false)
   end
 
   @spec mix_string(list()) :: String.t()
