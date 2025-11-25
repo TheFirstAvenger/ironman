@@ -1,6 +1,6 @@
 # Ironman
 
-[![Build Status](https://travis-ci.com/TheFirstAvenger/ironman.svg?branch=master)](https://travis-ci.com/TheFirstAvenger/ironman)
+[![Elixir CI](https://github.com/TheFirstAvenger/ironman/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/TheFirstAvenger/ironman/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/TheFirstAvenger/ironman/badge.svg?branch=master)](https://coveralls.io/github/TheFirstAvenger/ironman?branch=master)
 [![Project license](https://img.shields.io/hexpm/l/ironman.svg)](https://unlicense.org/)
 [![Hex.pm package](https://img.shields.io/hexpm/v/ironman.svg)](https://hex.pm/packages/ironman)
@@ -26,40 +26,40 @@ Ironman can be run from the root of any project by calling:
 
 Contributions welcome. Specifically looking to:
 
-* Complete items in current progress below.
+- Complete items in current progress below.
 
 ## Current Progress
 
 ### Add Dependencies
 
-* [X] [`:ex_doc`](https://github.com/elixir-lang/ex_doc)
-* ~~[X] [`:earmark`~](https://github.com/pragdave/earmark)~~ Now a dependency of `:ex_doc`
-* [X] [`:dialyxir`](https://github.com/jeremyjh/dialyxir)
-* [X] [`:mix_test_watch`](https://github.com/lpil/mix-test.watch)
-* [X] [`:credo`](https://github.com/rrrene/credo)
-* [X] [`:excoveralls`](https://github.com/parroty/excoveralls)
-* [X] [`:git_hooks`](https://github.com/qgadrian/elixir_git_hooks)
-* [ ] [`:ex_unit_notifier`](https://github.com/navinpeiris/ex_unit_notifier)
+- [x] [`:ex_doc`](https://github.com/elixir-lang/ex_doc)
+- ~~[X] [`:earmark`~](https://github.com/pragdave/earmark)~~ Now a dependency of `:ex_doc`
+- [x] [`:dialyxir`](https://github.com/jeremyjh/dialyxir)
+- [x] [`:mix_test_watch`](https://github.com/lpil/mix-test.watch)
+- [x] [`:credo`](https://github.com/rrrene/credo)
+- [x] [`:excoveralls`](https://github.com/parroty/excoveralls)
+- [x] [`:git_hooks`](https://github.com/qgadrian/elixir_git_hooks)
+- [ ] [`:ex_unit_notifier`](https://github.com/navinpeiris/ex_unit_notifier)
 
 ### Add Configuration
 
-* [X] [`:dialyxir`](https://github.com/jeremyjh/dialyxir)
-* [X] [`:credo`](https://github.com/rrrene/credo)
-* [X] [`:excoveralls`](https://github.com/parroty/excoveralls)
-* [X] [`:git_hooks`](https://github.com/qgadrian/elixir_git_hooks)
-* [ ] [`:ex_unit_notifier`](https://github.com/navinpeiris/ex_unit_notifier)
+- [x] [`:dialyxir`](https://github.com/jeremyjh/dialyxir)
+- [x] [`:credo`](https://github.com/rrrene/credo)
+- [x] [`:excoveralls`](https://github.com/parroty/excoveralls)
+- [x] [`:git_hooks`](https://github.com/qgadrian/elixir_git_hooks)
+- [ ] [`:ex_unit_notifier`](https://github.com/navinpeiris/ex_unit_notifier)
 
 ### CI Configurations
 
-* [ ] Travis
-* [ ] Gitlabs
-* [ ] CircleCI
+- [ ] Travis
+- [ ] Gitlabs
+- [ ] CircleCI
 
 ### Additional Features
 
-* [X] Self check/upgrade version
-* [X] Check for mix.exs file before running
-* [X] Check/warn for uncommitted files before running
-* [X] Check all dependencies for updates
-* [X] Ask what additional dependencies to add
-* [ ] Add test to ensure README.md referenced version is up to date with project version
+- [x] Self check/upgrade version
+- [x] Check for mix.exs file before running
+- [x] Check/warn for uncommitted files before running
+- [x] Check all dependencies for updates
+- [x] Ask what additional dependencies to add
+- [ ] Add test to ensure README.md referenced version is up to date with project version
