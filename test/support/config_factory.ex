@@ -3,10 +3,7 @@ defmodule Ironman.Test.Helpers.ConfigFactory do
   alias Ironman.Config
 
   def empty do
-    %Config{
-      mix_exs: "",
-      config_exs: ""
-    }
+    Config.new(mix_exs: "", config_exs: "")
   end
 
   def with_deps(deps \\ []) when is_list(deps) do
@@ -31,8 +28,8 @@ defmodule Ironman.Test.Helpers.ConfigFactory do
     end
     """
 
-    empty()
-    |> Map.put(:starting_project_config, app: :test)
+    [starting_project_config: [app: :test]]
+    |> Config.new()
     |> Config.set(:mix_exs, mix_exs, false)
     |> Config.set(:config_exs, "use Mix.Config\n\n", false)
   end
@@ -66,8 +63,8 @@ defmodule Ironman.Test.Helpers.ConfigFactory do
     end
     """
 
-    empty()
-    |> Map.put(:starting_project_config, dialyzer: [:asdf])
+    [starting_project_config: [dialyzer: [:asdf]]]
+    |> Config.new()
     |> Config.set(:mix_exs, mix_exs, false)
   end
 
@@ -97,11 +94,18 @@ defmodule Ironman.Test.Helpers.ConfigFactory do
     end
     """
 
-    empty()
-    |> Map.put(:starting_project_config,
-      test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test]
-    )
+    [
+      starting_project_config: [
+        test_coverage: [tool: ExCoveralls],
+        preferred_cli_env: [
+          coveralls: :test,
+          "coveralls.detail": :test,
+          "coveralls.post": :test,
+          "coveralls.html": :test
+        ]
+      ]
+    ]
+    |> Config.new()
     |> Config.set(:mix_exs, mix_exs, false)
   end
 
