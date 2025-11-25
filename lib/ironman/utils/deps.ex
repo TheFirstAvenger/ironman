@@ -3,6 +3,7 @@ defmodule Ironman.Utils.Deps do
 
   alias Ironman.Config
   alias Ironman.Utils
+  alias Ironman.Utils.Ast
 
   @ironman_version Mix.Project.config()[:version]
 
@@ -33,24 +34,16 @@ defmodule Ironman.Utils.Deps do
 
   @spec get_configured_version(Config.t(), dep()) :: String.t() | nil
   def get_configured_version(%Config{} = config, dep) do
-    "defp deps do.*?\\[.*?{:#{dep}, \"(.*?)\""
-    |> Regex.compile!("s")
-    |> Regex.run(Config.get(config, :mix_exs))
-    |> case do
-      [_, version] -> version
-      _ -> nil
-    end
+    config
+    |> Config.get(:mix_exs)
+    |> Ast.get_dep_version(dep)
   end
 
-  @spec get_configured_opts(Config.t(), dep()) :: String.t() | nil
+  @spec get_configured_opts(Config.t(), dep()) :: keyword() | nil
   def get_configured_opts(%Config{} = config, dep) do
-    "defp deps do.*?\\[.*?{:#{dep}, \"(.*?)\"(.*?)}"
-    |> Regex.compile!("s")
-    |> Regex.run(Config.get(config, :mix_exs))
-    |> case do
-      [_, _, ""] -> nil
-      [_, _, ", " <> opts] -> "[#{opts}]" |> Code.eval_string() |> elem(0)
-    end
+    config
+    |> Config.get(:mix_exs)
+    |> Ast.get_dep_opts(dep)
   end
 
   @spec available_version(dep()) :: {:ok, String.t()} | {:error, any()}
@@ -78,38 +71,17 @@ defmodule Ironman.Utils.Deps do
   @spec do_install(Config.t(), dep(), keyword(), String.t()) :: {:yes, Config.t()}
   def do_install(%Config{} = config, dep, dep_opts, available_version) do
     Utils.puts("Installing #{dep} #{available_version}")
-    new_version = "~> #{available_version}"
-    dep_opts_str = dep_opts_to_str(dep_opts)
     current_mix = Config.get(config, :mix_exs)
 
-    new_mix =
-      Regex.replace(
-        ~r/defp deps do.*?[\n\s\S]*?\[/,
-        current_mix,
-        "defp deps do\n    [{:#{dep}, \"#{new_version}\"#{dep_opts_str}},"
-      )
+    new_mix = Ast.add_dep(current_mix, dep, available_version, dep_opts)
 
     if current_mix == new_mix do
       Utils.puts("WARNING: Installing deps didn't change mix_exs")
     end
 
-    config =
-      Config.set(
-        config,
-        :mix_exs,
-        new_mix
-      )
+    config = Config.set(config, :mix_exs, new_mix)
 
     {:yes, config}
-  end
-
-  defp dep_opts_to_str(dep_opts) do
-    case dep_opts do
-      [] -> ""
-      [{key, value} | t] when value in [true, false, nil] -> ", #{key}: #{value}#{dep_opts_to_str(t)}"
-      [{key, value} | t] when is_atom(value) -> ", #{key}: :#{value}#{dep_opts_to_str(t)}"
-      [{key, value} | t] when is_binary(value) -> ", #{key}: \"#{value}\"#{dep_opts_to_str(t)}"
-    end
   end
 
   @spec skip_install(Config.t(), dep()) :: {:no, Config.t()}
@@ -129,27 +101,14 @@ defmodule Ironman.Utils.Deps do
 
   @spec do_upgrade(Config.t(), dep(), String.t(), String.t()) :: {:yes, Config.t()}
   def do_upgrade(%Config{} = config, dep, configured_version, available_version) do
-    # TODO
     Utils.puts("Upgrading #{dep} from #{configured_version} to #{available_version}")
-    new_version = "~> #{available_version}"
-    regex = Regex.compile!("{:#{dep}, \"~>.*?\"")
     current_mix = Config.get(config, :mix_exs)
-    new_mix = Regex.replace(regex, current_mix, "{:#{dep}, \"#{new_version}\"")
 
-    new_mix =
-      if current_mix == new_mix do
-        regex = Regex.compile!("{:#{dep}, \".*?\"")
-        current_mix = Config.get(config, :mix_exs)
-        new_mix = Regex.replace(regex, current_mix, "{:#{dep}, \"#{new_version}\"")
+    new_mix = Ast.update_dep_version(current_mix, dep, available_version)
 
-        if current_mix == new_mix do
-          Utils.puts("WARNING: Upgrade of #{dep} did not change mix.exs")
-        end
-
-        new_mix
-      else
-        new_mix
-      end
+    if current_mix == new_mix do
+      Utils.puts("WARNING: Upgrade of #{dep} did not change mix.exs")
+    end
 
     config = Config.set(config, :mix_exs, new_mix)
 
@@ -163,28 +122,9 @@ defmodule Ironman.Utils.Deps do
   end
 
   def get_installed_deps(%Config{} = config) do
-    mix = config |> Config.get(:mix_exs) |> remove_comments()
-
-    "defp deps do\\s*?\\[\\s*?({.*?})\\s*?]\\s*?end"
-    |> Regex.compile!("s")
-    |> Regex.run(mix)
-    |> case do
-      nil ->
-        []
-
-      deps_ret ->
-        deps_str = Enum.at(deps_ret, 1)
-
-        "{:([a-z_]*)"
-        |> Regex.compile!()
-        |> Regex.scan(deps_str)
-        |> Enum.map(&Enum.at(&1, 1))
-    end
-  end
-
-  def remove_comments(str) do
-    "^\\s*#.*$\n*"
-    |> Regex.compile!("m")
-    |> Regex.replace(str, "")
+    config
+    |> Config.get(:mix_exs)
+    |> Ast.get_all_dep_names()
+    |> Enum.map(&Atom.to_string/1)
   end
 end

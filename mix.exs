@@ -53,7 +53,8 @@ defmodule Ironman.MixProject do
       {:mix_test_watch, "~> 1.2", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:mox, "~> 1.1", only: :test},
-      {:styler, "~> 1.0", only: [:dev, :test], runtime: false}
+      {:styler, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:sourceror, "~> 1.7"}
     ]
   end
 

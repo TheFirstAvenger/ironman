@@ -2,6 +2,7 @@ defmodule Ironman.Checks.CoverallsConfig do
   @moduledoc false
   alias Ironman.Config
   alias Ironman.Utils
+  alias Ironman.Utils.Ast
   alias Ironman.Utils.Deps
 
   @spec run(Config.t()) :: {:error, any()} | {:no | :yes | :up_to_date | :skip, Config.t()}
@@ -42,7 +43,7 @@ defmodule Ironman.Checks.CoverallsConfig do
 
   defp set_coveralls_mix_exs(config) do
     mix_exs = Config.get(config, :mix_exs)
-    mix_exs = Regex.replace(~r/def project do\n.*?\[/, mix_exs, "def project do\n [ " <> coveralls_config())
+    mix_exs = Ast.add_to_project_config(mix_exs, coveralls_config())
     Config.set(config, :mix_exs, mix_exs)
   end
 

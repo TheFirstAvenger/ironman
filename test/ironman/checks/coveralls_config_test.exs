@@ -33,12 +33,14 @@ defmodule Ironman.Checks.CoverallsConfigTest do
       refute Config.get(config, :coveralls_json)
       MoxHelpers.expect_io("\nAdd coveralls config to project? [Yn] ", "Y")
       {:yes, config2} = CoverallsConfig.run(config)
-      assert String.contains?(Config.get(config2, :mix_exs), "test_coverage: [tool: ExCoveralls]")
+      mix_exs = Config.get(config2, :mix_exs)
 
-      assert String.contains?(
-               Config.get(config2, :mix_exs),
-               ~s(preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test])
-             )
+      assert mix_exs =~ "test_coverage: [tool: ExCoveralls]"
+      assert mix_exs =~ "preferred_cli_env:"
+      assert mix_exs =~ "coveralls: :test"
+      assert mix_exs =~ ~s("coveralls.detail": :test)
+      assert mix_exs =~ ~s("coveralls.post": :test)
+      assert mix_exs =~ ~s("coveralls.html": :test)
 
       assert Config.get(config2, :coveralls_json) == "{\n  \"skip_files\": []\n}"
     end
@@ -54,12 +56,14 @@ defmodule Ironman.Checks.CoverallsConfigTest do
       assert Config.get(config, :coveralls_json) == "existing coveralls config"
       MoxHelpers.expect_io("\nAdd coveralls config to project? [Yn] ", "Y")
       {:yes, config2} = CoverallsConfig.run(config)
-      assert String.contains?(Config.get(config2, :mix_exs), "test_coverage: [tool: ExCoveralls]")
+      mix_exs = Config.get(config2, :mix_exs)
 
-      assert String.contains?(
-               Config.get(config2, :mix_exs),
-               ~s(preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test])
-             )
+      assert mix_exs =~ "test_coverage: [tool: ExCoveralls]"
+      assert mix_exs =~ "preferred_cli_env:"
+      assert mix_exs =~ "coveralls: :test"
+      assert mix_exs =~ ~s("coveralls.detail": :test)
+      assert mix_exs =~ ~s("coveralls.post": :test)
+      assert mix_exs =~ ~s("coveralls.html": :test)
 
       assert Config.get(config2, :coveralls_json) == "existing coveralls config"
     end
