@@ -1,24 +1,21 @@
 defmodule Ironman.Utils.Deps do
   @moduledoc false
 
+  alias Ironman.Config
+  alias Ironman.Utils
+
   @ironman_version Mix.Project.config()[:version]
 
   @type dep :: atom()
-
-  alias Ironman.{
-    Config,
-    Utils
-  }
 
   @spec ironman_version() :: String.t()
   def ironman_version, do: @ironman_version
 
   @spec check_dep_version(Config.t(), dep()) :: {:yes | :no | :up_to_date, Config.t()} | {:error, any()}
   def check_dep_version(%Config{} = config, dep, dep_opts \\ []) when is_atom(dep) and is_list(dep_opts) do
-    with(
-      {:ok, available_version} <- available_version(dep),
-      configured_version <- get_configured_version(config, dep)
-    ) do
+    with({:ok, available_version} <- available_version(dep)) do
+      configured_version = get_configured_version(config, dep)
+
       case configured_version do
         nil ->
           offer_dep_install(config, dep, dep_opts, available_version)
@@ -31,8 +28,6 @@ defmodule Ironman.Utils.Deps do
             offer_dep_upgrade(config, dep, configured_version, available_version)
           end
       end
-    else
-      {:error, reason} -> {:error, reason}
     end
   end
 
@@ -61,7 +56,7 @@ defmodule Ironman.Utils.Deps do
   @spec available_version(dep()) :: {:ok, String.t()} | {:error, any()}
   def available_version(dep) do
     with(
-      {:ok, body} <- Ironman.Utils.get_body_as_term("https://hex.pm/api/packages/#{dep}"),
+      {:ok, body} <- Utils.get_body_as_term("https://hex.pm/api/packages/#{dep}"),
       %{"releases" => [%{"version" => version} | _]} <- body
     ) do
       {:ok, version}
@@ -142,9 +137,7 @@ defmodule Ironman.Utils.Deps do
     new_mix = Regex.replace(regex, current_mix, "{:#{dep}, \"#{new_version}\"")
 
     new_mix =
-      if current_mix != new_mix do
-        new_mix
-      else
+      if current_mix == new_mix do
         regex = Regex.compile!("{:#{dep}, \".*?\"")
         current_mix = Config.get(config, :mix_exs)
         new_mix = Regex.replace(regex, current_mix, "{:#{dep}, \"#{new_version}\"")
@@ -153,6 +146,8 @@ defmodule Ironman.Utils.Deps do
           Utils.puts("WARNING: Upgrade of #{dep} did not change mix.exs")
         end
 
+        new_mix
+      else
         new_mix
       end
 

@@ -3,7 +3,8 @@ defmodule Ironman.Checks.CredoConfigTest do
 
   alias Ironman.Checks.CredoConfig
   alias Ironman.Config
-  alias Ironman.Test.Helpers.{ConfigFactory, MoxHelpers}
+  alias Ironman.Test.Helpers.ConfigFactory
+  alias Ironman.Test.Helpers.MoxHelpers
 
   describe "run" do
     test "skips when credo not present" do

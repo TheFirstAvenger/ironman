@@ -1,8 +1,8 @@
 defmodule Ironman.Checks.AddDeps do
   @moduledoc false
-  alias Ironman.{Config, Utils}
+  alias Ironman.Config
+  alias Ironman.Utils
   alias Ironman.Utils.Deps
-
   alias Ironman.Utils.IO, as: IIO
 
   @spec run(Config.t()) :: {:error, any()} | {:no | :yes | :up_to_date | :skip, Config.t()}

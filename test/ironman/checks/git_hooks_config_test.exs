@@ -44,7 +44,8 @@ defmodule Ironman.Checks.GitHooksConfigTest do
 
     test "runs when config not present - config import commented out" do
       config =
-        ConfigFactory.with_deps(git_hooks: "~> 1.2.3")
+        [git_hooks: "~> 1.2.3"]
+        |> ConfigFactory.with_deps()
         |> Config.set(:config_exs, "use Mix.Config\n\n#\n#\n#     import_config \"\#{Mix.env\(\)}.exs\"\n")
 
       MoxHelpers.expect_io("\nAdd git_hooks config to project? [Yn] ", "Y")
@@ -54,7 +55,8 @@ defmodule Ironman.Checks.GitHooksConfigTest do
 
     test "runs when config not present - *.exs present" do
       config =
-        ConfigFactory.with_deps(git_hooks: "~> 1.2.3")
+        [git_hooks: "~> 1.2.3"]
+        |> ConfigFactory.with_deps()
         |> Config.set(:config_dev_exs, "use Mix.Config\n\n")
         |> Config.set(:config_test_exs, "use Mix.Config\n\n")
         |> Config.set(:config_prod_exs, "use Mix.Config\n\n")
@@ -71,7 +73,8 @@ defmodule Ironman.Checks.GitHooksConfigTest do
 
     test "runs when no config directry exists" do
       config =
-        ConfigFactory.with_deps(git_hooks: "~> 1.2.3")
+        [git_hooks: "~> 1.2.3"]
+        |> ConfigFactory.with_deps()
         |> Config.set(:config_exs, nil, false)
 
       MoxHelpers.expect_io("\nAdd git_hooks config to project? [Yn] ", "Y")

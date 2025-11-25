@@ -106,15 +106,15 @@ defmodule Ironman.Test.Helpers.ConfigFactory do
   end
 
   def with_git_hooks_config do
-    with_deps(git_hooks: "1.2.3")
+    [git_hooks: "1.2.3"]
+    |> with_deps()
     |> Config.set(:config_dev_exs, "use Mix.Config\n\nconfig :git_hooks,", false)
   end
 
   @spec mix_string(list()) :: String.t()
   def mix_string(deps) do
     deps
-    |> Enum.map(fn {dep, ver} -> "      {:#{dep}, \"#{ver}\"}" end)
-    |> Enum.join(",\n")
+    |> Enum.map_join(",\n", fn {dep, ver} -> "      {:#{dep}, \"#{ver}\"}" end)
     |> wrap_brackets()
   end
 

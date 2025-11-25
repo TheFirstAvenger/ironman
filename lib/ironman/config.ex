@@ -4,7 +4,8 @@ defmodule Ironman.Config do
   all the checks, where it is updated, and then files are written out at the end based on its contents.
   """
 
-  alias Ironman.{Config, Utils}
+  alias Ironman.Config
+  alias Ironman.Utils
   alias Ironman.Utils.File, as: IFile
 
   @settable_keys [
@@ -67,7 +68,7 @@ defmodule Ironman.Config do
   def set(%Config{changed: changed} = config, key, value, changed_flag \\ true) when key in @settable_keys do
     config =
       if changed_flag and get(config, key) != value do
-        %Config{config | changed: MapSet.put(changed, key)}
+        %{config | changed: MapSet.put(changed, key)}
       else
         config
       end
@@ -91,8 +92,6 @@ defmodule Ironman.Config do
   defp file_or_nil(path) do
     if IFile.exists?(path) do
       IFile.read!(path)
-    else
-      nil
     end
   end
 end

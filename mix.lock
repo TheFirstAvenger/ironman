@@ -17,4 +17,5 @@
   "nimble_ownership": {:hex, :nimble_ownership, "1.0.2", "fa8a6f2d8c592ad4d79b2ca617473c6aefd5869abfa02563a77682038bf916cf", [:mix], [], "hexpm", "098af64e1f6f8609c6672127cfe9e9590a5d3fcdd82bc17a377b8692fd81a879"},
   "nimble_parsec": {:hex, :nimble_parsec, "1.4.2", "8efba0122db06df95bfaa78f791344a89352ba04baedd3849593bfce4d0dc1c6", [:mix], [], "hexpm", "4b21398942dda052b403bbe1da991ccd03a053668d147d53fb8c4e0efe09c973"},
   "recase": {:hex, :recase, "0.8.1", "ab98cd35857a86fa5ca99036f575241d71d77d9c2ab0c39aacf1c9b61f6f7d1d", [:mix], [], "hexpm", "9fd8d63e7e43bd9ea385b12364e305778b2bbd92537e95c4b2e26fc507d5e4c2"},
+  "styler": {:hex, :styler, "1.9.1", "e30f0e909c02c686c75e47c07a76986483525eeb23c4d136f00dfa1c25fc6499", [:mix], [], "hexpm", "f583bedd92515245801f9ad504766255a27ecd5714fc4f1fd607de0eb951e1cf"},
 }

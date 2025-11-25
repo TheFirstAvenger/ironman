@@ -1,6 +1,7 @@
 defmodule Ironman.Checks.CredoConfig do
   @moduledoc false
-  alias Ironman.{Config, Utils}
+  alias Ironman.Config
+  alias Ironman.Utils
   alias Ironman.Utils.Deps
 
   @credo_config_filename Path.join([__DIR__, "../../../deps/credo/.credo.exs"])
