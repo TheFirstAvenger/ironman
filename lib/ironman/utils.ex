@@ -56,6 +56,66 @@ defmodule Ironman.Utils do
     end
   end
 
+  def check_git_repo do
+    case ICmd.run(["git", "rev-parse", "--git-dir"]) do
+      {:ok, _} ->
+        :ok
+
+      {:error, _} ->
+        ask(
+          "No git repository found. Initialize one now?",
+          &init_git_repo/0,
+          fn ->
+            puts("Continuing without git repository...")
+            :ok
+          end
+        )
+    end
+  rescue
+    _ ->
+      puts("Git not found, continuing without git support...")
+      :ok
+  end
+
+  defp init_git_repo do
+    puts("Initializing git repository...")
+
+    case ICmd.run(["git", "init"]) do
+      {:ok, _} ->
+        puts("Git repository initialized.")
+        ask_initial_commit()
+
+      {:error, {_, msg}} ->
+        puts("Failed to initialize git repository: #{msg}")
+        :ok
+    end
+  end
+
+  defp ask_initial_commit do
+    ask(
+      "Create initial commit with all current files?",
+      &create_initial_commit/0,
+      fn ->
+        puts("Skipping initial commit.")
+        :ok
+      end
+    )
+  end
+
+  defp create_initial_commit do
+    puts("Creating initial commit...")
+
+    with {:ok, _} <- ICmd.run(["git", "add", "-A"]),
+         {:ok, _} <- ICmd.run(["git", "commit", "-m", "Initial commit"]) do
+      puts("Initial commit created.")
+      :ok
+    else
+      {:error, {_, msg}} ->
+        puts("Failed to create initial commit: #{msg}")
+        :ok
+    end
+  end
+
   def check_git_status do
     case ICmd.run(["git", "status", "--porcelain"]) do
       {:ok, ""} ->
@@ -63,18 +123,18 @@ defmodule Ironman.Utils do
 
       {:ok, _} ->
         ask(
-          "You seem to have uncommitted files. Exit now so you can commit before continuing?",
+          "You have uncommitted changes. Exit now so you can commit before continuing?",
           fn -> :exit end,
           fn -> :ok end
         )
 
       {:error, _} ->
-        puts("Unable to check for uncommitted files (not a git repository)")
+        # No git repo, already handled by check_git_repo
         :ok
     end
   rescue
     _ ->
-      puts("Unable to check for uncommitted files (git not found)")
+      # Git not found, already handled by check_git_repo
       :ok
   end
 
@@ -112,23 +172,56 @@ defmodule Ironman.Utils do
   @spec ask_mix_format() :: any()
   def ask_mix_format do
     ask(
-      "Your files are not formatted. Mix Format needs to be run before continuing.",
-      &run_mix_format_and_ask_to_exit/0,
+      "Your code is not formatted. Ironman will modify your code and may change formatting.\nRun mix format now?",
+      &run_mix_format_and_offer_commit/0,
       fn -> :exit end
     )
   end
 
-  defp run_mix_format_and_ask_to_exit do
+  defp run_mix_format_and_offer_commit do
     case run_mix_format() do
       :ok ->
-        ask(
-          "Mix format complete. Exit now so you can commit the formatted version before continuing?",
-          fn -> :exit end,
-          fn -> :ok end
-        )
+        offer_format_commit()
 
       :exit ->
         :exit
+    end
+  end
+
+  defp offer_format_commit do
+    # Check if we have a git repo
+    case ICmd.run(["git", "rev-parse", "--git-dir"]) do
+      {:ok, _} ->
+        ask(
+          "Mix format complete. Commit the formatting changes?",
+          &commit_format_changes/0,
+          fn ->
+            puts("Continuing without committing format changes.")
+            :ok
+          end
+        )
+
+      {:error, _} ->
+        puts("Mix format complete.")
+        :ok
+    end
+  rescue
+    _ ->
+      puts("Mix format complete.")
+      :ok
+  end
+
+  defp commit_format_changes do
+    puts("Committing format changes...")
+
+    with {:ok, _} <- ICmd.run(["git", "add", "-A"]),
+         {:ok, _} <- ICmd.run(["git", "commit", "-m", "Run mix format"]) do
+      puts("Format changes committed.")
+      :ok
+    else
+      {:error, {_, msg}} ->
+        puts("Failed to commit format changes: #{msg}")
+        :ok
     end
   end
 

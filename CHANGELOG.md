@@ -2,6 +2,7 @@
 
 ## Next
 
+- Check git repo status before running
 - Update Elixir and Erlang versions
 
 ## 0.4.6

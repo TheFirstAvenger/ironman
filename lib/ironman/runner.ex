@@ -28,6 +28,7 @@ defmodule Ironman.Runner do
   def run do
     if Utils.check_self_version() == :exit, do: System.halt()
     if Utils.check_mix_exs() == :exit, do: System.halt()
+    if Utils.check_git_repo() == :exit, do: System.halt()
     if Utils.check_git_status() == :exit, do: System.halt()
     if Utils.check_mix_format() == :exit, do: System.halt()
     config = Config.new!()
