@@ -33,25 +33,71 @@ defmodule Ironman.Utils.Deps do
 
   @spec get_configured_version(Config.t(), dep()) :: String.t() | nil
   def get_configured_version(%Config{} = config, dep) do
-    "defp deps do.*?\\[.*?{:#{dep}, \"(.*?)\""
-    |> Regex.compile!("s")
-    |> Regex.run(Config.get(config, :mix_exs))
+    config
+    |> Config.get(:mix_exs)
+    |> find_dep_in_deps_function(dep)
     |> case do
-      [_, version] -> version
-      _ -> nil
+      {:ok, {_dep_atom, version, _opts}} -> version
+      :not_found -> nil
     end
   end
 
-  @spec get_configured_opts(Config.t(), dep()) :: String.t() | nil
+  @spec get_configured_opts(Config.t(), dep()) :: keyword() | nil
   def get_configured_opts(%Config{} = config, dep) do
-    "defp deps do.*?\\[.*?{:#{dep}, \"(.*?)\"(.*?)}"
-    |> Regex.compile!("s")
-    |> Regex.run(Config.get(config, :mix_exs))
+    config
+    |> Config.get(:mix_exs)
+    |> find_dep_in_deps_function(dep)
     |> case do
-      [_, _, ""] -> nil
-      [_, _, ", " <> opts] -> "[#{opts}]" |> Code.eval_string() |> elem(0)
+      {:ok, {_dep_atom, _version, []}} -> nil
+      {:ok, {_dep_atom, _version, opts}} -> opts
+      :not_found -> nil
     end
   end
+
+  defp find_dep_in_deps_function(mix_exs, dep) do
+    case Code.string_to_quoted(mix_exs) do
+      {:ok, ast} ->
+        deps_list = extract_deps_list(ast)
+        find_dep_in_list(deps_list, dep)
+
+      {:error, _} ->
+        :not_found
+    end
+  end
+
+  defp extract_deps_list(ast) do
+    {_ast, deps} =
+      Macro.prewalk(ast, nil, fn
+        {:defp, _, [{:deps, _, _}, [do: deps_list]]} = node, _acc ->
+          {node, deps_list}
+
+        node, acc ->
+          {node, acc}
+      end)
+
+    deps
+  end
+
+  defp find_dep_in_list(nil, _dep), do: :not_found
+  defp find_dep_in_list([], _dep), do: :not_found
+
+  defp find_dep_in_list(deps_list, dep) when is_list(deps_list) do
+    Enum.find_value(deps_list, :not_found, fn
+      # 3-element tuple AST: {:dep, version, opts}
+      {:{}, _, [^dep, version | opts_list]} ->
+        opts = List.flatten(opts_list)
+        {:ok, {dep, version, opts}}
+
+      # 2-element tuple that looks like keyword: [dep: version]
+      {^dep, version} when is_binary(version) ->
+        {:ok, {dep, version, []}}
+
+      _ ->
+        nil
+    end)
+  end
+
+  defp find_dep_in_list(_other, _dep), do: :not_found
 
   @spec available_version(dep()) :: {:ok, String.t()} | {:error, any()}
   def available_version(dep) do
@@ -78,39 +124,126 @@ defmodule Ironman.Utils.Deps do
   @spec do_install(Config.t(), dep(), keyword(), String.t()) :: {:yes, Config.t()}
   def do_install(%Config{} = config, dep, dep_opts, available_version) do
     Utils.puts("Installing #{dep} #{available_version}")
-    new_version = "~> #{available_version}"
-    dep_opts_str = dep_opts_to_str(dep_opts)
     current_mix = Config.get(config, :mix_exs)
 
-    new_mix =
-      Regex.replace(
-        ~r/defp deps do.*?[\n\s\S]*?\[/,
-        current_mix,
-        "defp deps do\n    [{:#{dep}, \"#{new_version}\"#{dep_opts_str}},"
-      )
+    new_mix = insert_dep_into_mix(current_mix, dep, "~> #{available_version}", dep_opts)
 
     if current_mix == new_mix do
       Utils.puts("WARNING: Installing deps didn't change mix_exs")
     end
 
-    config =
-      Config.set(
-        config,
-        :mix_exs,
-        new_mix
-      )
+    config = Config.set(config, :mix_exs, new_mix)
 
     {:yes, config}
   end
 
-  defp dep_opts_to_str(dep_opts) do
-    case dep_opts do
-      [] -> ""
-      [{key, value} | t] when value in [true, false, nil] -> ", #{key}: #{value}#{dep_opts_to_str(t)}"
-      [{key, value} | t] when is_atom(value) -> ", #{key}: :#{value}#{dep_opts_to_str(t)}"
-      [{key, value} | t] when is_binary(value) -> ", #{key}: \"#{value}\"#{dep_opts_to_str(t)}"
+  defp insert_dep_into_mix(mix_exs, dep, version, opts) do
+    case Code.string_to_quoted(mix_exs, columns: true, token_metadata: true) do
+      {:ok, ast} ->
+        case find_deps_list_location(ast) do
+          {:ok, line, _col} ->
+            insert_dep_at_line(mix_exs, line, dep, version, opts)
+
+          {:keyword_list, start_line, first_dep} ->
+            insert_dep_before_first(mix_exs, start_line, first_dep, dep, version, opts)
+
+          {:empty_list, start_line} ->
+            replace_empty_deps_list(mix_exs, start_line, dep, version, opts)
+
+          :not_found ->
+            mix_exs
+        end
+
+      {:error, _} ->
+        mix_exs
     end
   end
+
+  defp insert_dep_before_first(mix_exs, start_line, first_dep, dep, version, opts) do
+    dep_str = format_dep_tuple(dep, version, opts)
+    pattern = ~r/(\{:#{first_dep},)/
+
+    mix_exs
+    |> String.split("\n")
+    |> Enum.with_index(1)
+    |> Enum.map_join("\n", fn {line, idx} ->
+      if idx > start_line and Regex.match?(pattern, line), do: dep_str <> ",\n" <> line, else: line
+    end)
+  end
+
+  defp replace_empty_deps_list(mix_exs, start_line, dep, version, opts) do
+    dep_str = format_dep_tuple(dep, version, opts)
+
+    mix_exs
+    |> String.split("\n")
+    |> Enum.with_index(1)
+    |> Enum.map_join("\n", fn {line, idx} ->
+      if idx >= start_line and String.contains?(line, "[]"),
+        do: String.replace(line, "[]", "[\n#{dep_str}\n    ]", global: false),
+        else: line
+    end)
+  end
+
+  defp find_deps_list_location(ast) do
+    {_ast, result} =
+      Macro.prewalk(ast, :not_found, fn
+        {:defp, meta, [{:deps, _, _}, [do: deps_list]]} = node, _acc ->
+          location = get_list_opening_location(deps_list, meta)
+          {node, location}
+
+        node, acc ->
+          {node, acc}
+      end)
+
+    result
+  end
+
+  defp get_list_opening_location(list, defp_meta) when is_list(list) do
+    case list do
+      # 3-element tuple has metadata
+      [{:{}, meta, _} | _] ->
+        {:ok, meta[:line], meta[:column] || 1}
+
+      # Keyword list (2-element tuples) - no per-element metadata available
+      # We'll use a marker to indicate we need to search in the source text
+      [{atom, _value} | _] when is_atom(atom) ->
+        do_meta = Keyword.get(defp_meta, :do, [])
+        line = Keyword.get(do_meta, :line, 1)
+        {:keyword_list, line, atom}
+
+      [] ->
+        # Empty list - we need to find and replace the []
+        do_meta = Keyword.get(defp_meta, :do, [])
+        line = Keyword.get(do_meta, :line, 1)
+        {:empty_list, line}
+    end
+  end
+
+  defp get_list_opening_location(_other, _meta), do: :not_found
+
+  defp insert_dep_at_line(mix_exs, target_line, dep, version, opts) do
+    dep_str = format_dep_tuple(dep, version, opts)
+
+    mix_exs
+    |> String.split("\n")
+    |> Enum.with_index(1)
+    |> Enum.map_join("\n", fn {line, idx} ->
+      if idx == target_line, do: dep_str <> ",\n" <> line, else: line
+    end)
+  end
+
+  defp format_dep_tuple(dep, version, []) do
+    "      {:#{dep}, \"#{version}\"}"
+  end
+
+  defp format_dep_tuple(dep, version, opts) do
+    opts_str = Enum.map_join(opts, ", ", &format_opt/1)
+    "      {:#{dep}, \"#{version}\", #{opts_str}}"
+  end
+
+  defp format_opt({key, value}) when value in [true, false, nil], do: "#{key}: #{value}"
+  defp format_opt({key, value}) when is_atom(value), do: "#{key}: :#{value}"
+  defp format_opt({key, value}) when is_binary(value), do: "#{key}: \"#{value}\""
 
   @spec skip_install(Config.t(), dep()) :: {:no, Config.t()}
   def skip_install(%Config{} = config, dep) do
@@ -129,31 +262,24 @@ defmodule Ironman.Utils.Deps do
 
   @spec do_upgrade(Config.t(), dep(), String.t(), String.t()) :: {:yes, Config.t()}
   def do_upgrade(%Config{} = config, dep, configured_version, available_version) do
-    # TODO
     Utils.puts("Upgrading #{dep} from #{configured_version} to #{available_version}")
-    new_version = "~> #{available_version}"
-    regex = Regex.compile!("{:#{dep}, \"~>.*?\"")
     current_mix = Config.get(config, :mix_exs)
-    new_mix = Regex.replace(regex, current_mix, "{:#{dep}, \"#{new_version}\"")
+    new_version = "~> #{available_version}"
 
-    new_mix =
-      if current_mix == new_mix do
-        regex = Regex.compile!("{:#{dep}, \".*?\"")
-        current_mix = Config.get(config, :mix_exs)
-        new_mix = Regex.replace(regex, current_mix, "{:#{dep}, \"#{new_version}\"")
+    new_mix = update_dep_version_in_mix(current_mix, dep, new_version)
 
-        if current_mix == new_mix do
-          Utils.puts("WARNING: Upgrade of #{dep} did not change mix.exs")
-        end
-
-        new_mix
-      else
-        new_mix
-      end
+    if current_mix == new_mix do
+      Utils.puts("WARNING: Upgrade of #{dep} did not change mix.exs")
+    end
 
     config = Config.set(config, :mix_exs, new_mix)
 
     {:yes, config}
+  end
+
+  defp update_dep_version_in_mix(mix_exs, dep, new_version) do
+    pattern = ~r/(\{:#{dep},\s*")[^"]*(")/
+    Regex.replace(pattern, mix_exs, "\\1#{new_version}\\2", global: false)
   end
 
   @spec skip_upgrade(Config.t(), any()) :: {:no, Config.t()}
@@ -163,28 +289,25 @@ defmodule Ironman.Utils.Deps do
   end
 
   def get_installed_deps(%Config{} = config) do
-    mix = config |> Config.get(:mix_exs) |> remove_comments()
+    mix_exs = Config.get(config, :mix_exs)
 
-    "defp deps do\\s*?\\[\\s*?({.*?})\\s*?]\\s*?end"
-    |> Regex.compile!("s")
-    |> Regex.run(mix)
-    |> case do
-      nil ->
+    case Code.string_to_quoted(mix_exs) do
+      {:ok, ast} ->
+        deps_list = extract_deps_list(ast)
+        extract_dep_names(deps_list)
+
+      {:error, _} ->
         []
-
-      deps_ret ->
-        deps_str = Enum.at(deps_ret, 1)
-
-        "{:([a-z_]*)"
-        |> Regex.compile!()
-        |> Regex.scan(deps_str)
-        |> Enum.map(&Enum.at(&1, 1))
     end
   end
 
-  def remove_comments(str) do
-    "^\\s*#.*$\n*"
-    |> Regex.compile!("m")
-    |> Regex.replace(str, "")
+  defp extract_dep_names(deps_list) when is_list(deps_list) do
+    Enum.flat_map(deps_list, fn
+      {:{}, _, [dep | _]} when is_atom(dep) -> [Atom.to_string(dep)]
+      {dep, version} when is_atom(dep) and is_binary(version) -> [Atom.to_string(dep)]
+      _ -> []
+    end)
   end
+
+  defp extract_dep_names(_), do: []
 end

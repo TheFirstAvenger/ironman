@@ -28,3 +28,4 @@ ironman-*.tar
 /priv/plts/*.plt.hash
 
 .claude/
+AGENTS.MD
