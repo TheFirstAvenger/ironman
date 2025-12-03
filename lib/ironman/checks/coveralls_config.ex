@@ -12,13 +12,22 @@ defmodule Ironman.Checks.CoverallsConfig do
 
       _ ->
         spc = Config.get(config, :starting_project_config)
+        mix_exs = Config.get(config, :mix_exs)
 
-        if !Keyword.get(spc, :test_coverage, nil) or !Keyword.get(spc, :preferred_cli_env, nil) do
+        has_test_coverage = Keyword.get(spc, :test_coverage, nil) != nil
+        has_cli_config = has_cli_preferred_envs?(mix_exs)
+
+        if !has_test_coverage or !has_cli_config do
           offer_add_coveralls_config(config)
         else
           {:up_to_date, config}
         end
     end
+  end
+
+  defp has_cli_preferred_envs?(mix_exs) do
+    # Check if def cli exists with preferred_envs containing coveralls
+    Regex.match?(~r/def cli\b.*preferred_envs:.*coveralls/s, mix_exs)
   end
 
   def offer_add_coveralls_config(%Config{} = config) do
@@ -42,14 +51,42 @@ defmodule Ironman.Checks.CoverallsConfig do
 
   defp set_coveralls_mix_exs(config) do
     mix_exs = Config.get(config, :mix_exs)
-    new_mix_exs = insert_coveralls_config(mix_exs)
+
+    new_mix_exs =
+      mix_exs
+      |> insert_test_coverage_config()
+      |> insert_cli_function()
+
     Config.set(config, :mix_exs, new_mix_exs)
   end
 
-  defp insert_coveralls_config(mix_exs) do
-    pattern = ~r/(def project do\s*\[)/s
-    replacement = "\\1\n" <> String.trim_trailing(coveralls_config())
-    Regex.replace(pattern, mix_exs, replacement, global: false)
+  defp insert_test_coverage_config(mix_exs) do
+    if String.contains?(mix_exs, "test_coverage:") do
+      mix_exs
+    else
+      pattern = ~r/(def project do\s*\[)/s
+      replacement = "\\1\n" <> String.trim_trailing(test_coverage_config())
+      Regex.replace(pattern, mix_exs, replacement, global: false)
+    end
+  end
+
+  defp insert_cli_function(mix_exs) do
+    if Regex.match?(~r/def cli\b/, mix_exs) do
+      # def cli exists, update it to include preferred_envs if not present
+      if String.contains?(mix_exs, "preferred_envs:") do
+        mix_exs
+      else
+        # Add preferred_envs to existing def cli
+        pattern = ~r/(def cli do\s*\[)/s
+        replacement = "\\1\n" <> String.trim_trailing(preferred_envs_config())
+        Regex.replace(pattern, mix_exs, replacement, global: false)
+      end
+    else
+      # No def cli exists, add it before the end of the module
+      pattern = ~r/(\n\s*end\s*)$/
+      replacement = "\n" <> cli_function() <> "\\1"
+      Regex.replace(pattern, mix_exs, replacement, global: false)
+    end
   end
 
   defp set_coveralls_json(config) do
@@ -59,10 +96,25 @@ defmodule Ironman.Checks.CoverallsConfig do
     end
   end
 
-  defp coveralls_config do
+  defp test_coverage_config do
     """
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
+    """
+  end
+
+  defp preferred_envs_config do
+    """
+      preferred_envs: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
+    """
+  end
+
+  defp cli_function do
+    """
+      def cli do
+        [
+          preferred_envs: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test]
+        ]
+      end
     """
   end
 
