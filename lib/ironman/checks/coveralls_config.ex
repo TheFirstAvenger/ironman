@@ -42,8 +42,14 @@ defmodule Ironman.Checks.CoverallsConfig do
 
   defp set_coveralls_mix_exs(config) do
     mix_exs = Config.get(config, :mix_exs)
-    mix_exs = Regex.replace(~r/def project do\n.*?\[/, mix_exs, "def project do\n [ " <> coveralls_config())
-    Config.set(config, :mix_exs, mix_exs)
+    new_mix_exs = insert_coveralls_config(mix_exs)
+    Config.set(config, :mix_exs, new_mix_exs)
+  end
+
+  defp insert_coveralls_config(mix_exs) do
+    pattern = ~r/(def project do\s*\[)/
+    replacement = "\\1\n" <> String.trim_trailing(coveralls_config())
+    Regex.replace(pattern, mix_exs, replacement, global: false)
   end
 
   defp set_coveralls_json(config) do
