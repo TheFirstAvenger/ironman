@@ -147,8 +147,8 @@ defmodule Ironman.Utils.Deps do
           {:keyword_list, start_line, first_dep} ->
             insert_dep_before_first(mix_exs, start_line, first_dep, dep, version, opts)
 
-          {:empty_list, start_line} ->
-            replace_empty_deps_list(mix_exs, start_line, dep, version, opts)
+          :empty_list ->
+            replace_empty_deps_list(mix_exs, dep, version, opts)
 
           :not_found ->
             mix_exs
@@ -171,17 +171,14 @@ defmodule Ironman.Utils.Deps do
     end)
   end
 
-  defp replace_empty_deps_list(mix_exs, start_line, dep, version, opts) do
+  defp replace_empty_deps_list(mix_exs, dep, version, opts) do
     dep_str = format_dep_tuple(dep, version, opts)
+    new_list = "[\n#{dep_str}\n    ]"
 
-    mix_exs
-    |> String.split("\n")
-    |> Enum.with_index(1)
-    |> Enum.map_join("\n", fn {line, idx} ->
-      if idx >= start_line and String.contains?(line, "[]"),
-        do: String.replace(line, "[]", "[\n#{dep_str}\n    ]", global: false),
-        else: line
-    end)
+    # Match the deps list from [ to ] (including comments), replace with fresh list
+    pattern = ~r/(defp deps do\s*)\[.*?\]/s
+
+    Regex.replace(pattern, mix_exs, "\\1#{new_list}", global: false)
   end
 
   defp find_deps_list_location(ast) do
@@ -212,10 +209,7 @@ defmodule Ironman.Utils.Deps do
         {:keyword_list, line, atom}
 
       [] ->
-        # Empty list - we need to find and replace the []
-        do_meta = Keyword.get(defp_meta, :do, [])
-        line = Keyword.get(do_meta, :line, 1)
-        {:empty_list, line}
+        :empty_list
     end
   end
 
