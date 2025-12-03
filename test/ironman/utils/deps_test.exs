@@ -112,13 +112,9 @@ defmodule Ironman.Utils.DepsTest do
 
       config = build_config_with_mix_exs(starting_mix)
 
-      # When deps list only has comments, we can't find a valid insertion point
-      # since comments aren't part of the AST. The function returns unchanged mix_exs
       {:yes, %Config{mix_exs: new_mix}} = Deps.do_install(config, :baz, [opt1: true], "5.6.7")
 
-      # With AST-based approach, we need at least one real dep to find insertion point
-      # This is expected behavior - empty/comment-only lists don't have AST nodes to locate
-      assert new_mix == starting_mix or String.contains?(new_mix, "{:baz, \"~> 5.6.7\"}")
+      assert String.contains?(new_mix, "{:baz, \"~> 5.6.7\", opt1: true}")
     end
 
     test "adds dep to list with existing deps" do

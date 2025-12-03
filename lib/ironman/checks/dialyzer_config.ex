@@ -41,7 +41,9 @@ defmodule Ironman.Checks.DialyzerConfig do
 
   defp set_dialyzer_mix_exs(config) do
     mix_exs = Config.get(config, :mix_exs)
-    mix_exs = Regex.replace(~r/def project do\n.*?\[/, mix_exs, "def project do\n [ " <> dialyzer_config(config))
+    pattern = ~r/(def project do\s*\[)/s
+    replacement = "\\1\n" <> String.trim_trailing(dialyzer_config(config))
+    mix_exs = Regex.replace(pattern, mix_exs, replacement, global: false)
     Config.set(config, :mix_exs, mix_exs)
   end
 

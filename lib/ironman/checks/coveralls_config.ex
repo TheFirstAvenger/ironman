@@ -47,7 +47,7 @@ defmodule Ironman.Checks.CoverallsConfig do
   end
 
   defp insert_coveralls_config(mix_exs) do
-    pattern = ~r/(def project do\s*\[)/
+    pattern = ~r/(def project do\s*\[)/s
     replacement = "\\1\n" <> String.trim_trailing(coveralls_config())
     Regex.replace(pattern, mix_exs, replacement, global: false)
   end
